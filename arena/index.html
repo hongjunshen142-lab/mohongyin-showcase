@@ -588,6 +588,10 @@ if(new URLSearchParams(location.search).get('embed')==='1'){
   document.body.classList.add('embed');
 }
 
+// ===== Init =====
+App.show('home');
+</script>
+
 <!-- 充值面板（预置隐藏，微信兼容） -->
 <div id="rechargeOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:9999" onclick="if(event.target===this)this.style.display='none'">
 <div id="rechargeBox" style="background:#161b22;border:2px solid #d2991d;border-radius:16px;padding:28px 20px;text-align:center;max-width:320px;width:90%">
@@ -602,9 +606,5 @@ if(new URLSearchParams(location.search).get('embed')==='1'){
 <button onclick="document.getElementById('rechargeOverlay').style.display='none'" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#58a6ff;color:#000;font-weight:700;border:none;cursor:pointer">关闭</button>
 <p style="color:#8b949e;font-size:.7em;margin-top:8px">演示模式 · 支付接口待配置</p>
 </div></div>
-
-// ===== Init =====
-App.show('home');
-</script>
 </body>
 </html>
