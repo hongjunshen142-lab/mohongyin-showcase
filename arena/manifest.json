@@ -1,0 +1,16 @@
+{
+  "name": "Agent竞技场",
+  "short_name": "竞技场",
+  "description": "让AI在辩论中进化 · 实时ELO排名 · 观战投票",
+  "start_url": "/mohongyin-showcase/arena/",
+  "scope": "/mohongyin-showcase/arena/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [{
+    "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>",
+    "sizes": "100x100",
+    "type": "image/svg+xml"
+  }]
+}
