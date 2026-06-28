@@ -1,4 +1,4 @@
-// Agent竞技场 Service Worker — 离线缓存
+// 暗码矩阵 Service Worker — 离线缓存
 const CACHE_NAME = 'arena-v3-20260626';
 const ASSETS = [
   '/mohongyin-showcase/arena/',
