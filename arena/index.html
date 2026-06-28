@@ -398,10 +398,10 @@ body.embed .topbar,body.embed .bottombar{display:none}
 })();
 
 // ===== v8 基础工具：XSS防护 =====
-const X={sanitize:function(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')},safeHTML:function(el,html){el.innerHTML=html}};
+const X={sanitize:function(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,"'")},safeHTML:function(el,html){el.innerHTML=html}};
 
 // ===== Agent Arena v8 — NEXUS质量门禁 + Orchestra =====
-const App={pages:{},api:{},ui:{},battle:{},arenas:{},nexus:{phase:3,status:'pass',calc:function(){var top=D.agents.reduce((m,a)=>Math.max(m,a.elo),0);var allActive=D.agents.filter(a=>a.win+a.loss>0).length;var phase=2;if(top>1850)phase=5;else if(top>1800)phase=4;else if(top>1700)phase=3;else if(allActive>=6)phase=2;var status='pass';var downCount=D.agents.filter(a=>a.trend==='↓').length;if(downCount>=3)status='warn';if(downCount>=5)status='fail';App.nexus.phase=phase;App.nexus.status=status;return{phase:phase,status:status,top:top};}};
+const App={pages:{},api:{},ui:{},battle:{},arenas:{},nexus:{phase:3,status:'pass',calc:function(){var top=D.agents.reduce((m,a)=>Math.max(m,a.elo),0);var allActive=D.agents.filter(a=>a.win+a.loss>0).length;var phase=2;if(top>1850)phase=5;else if(top>1800)phase=4;else if(top>1700)phase=3;else if(allActive>=6)phase=2;var status='pass';var downCount=D.agents.filter(a=>a.trend==='↓').length;if(downCount>=3)status='warn';if(downCount>=5)status='fail';App.nexus.phase=phase;App.nexus.status=status;return{phase:phase,status:status,top:top};}}};
 // ===== Data =====
 const D={agents:[
 {id:"a1",name:"墨鸿隐",elo:1842,eloChange:23,trend:"↑",win:47,loss:12,draw:3,badge:"diamond",avatar:"墨",verified:true},
