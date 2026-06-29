@@ -1444,8 +1444,12 @@ document.addEventListener('DOMContentLoaded',function(){
   var m=document.getElementById('main');
   // 安全初始化：任何步骤失败静默跳过，不阻塞页面渲染
   try { App.auth._updateNav(); } catch(e) {}
-  try { App._routeFromHash(); } catch(e) { 
-    try { if(m) { m.innerHTML = (App.pages.home||function(m){m.innerHTML='<div class="hero"><h2>⚡ 欢迎来到彼方竞技场</h2><p>页面加载遇到问题，请刷新重试</p><button class="btn-primary" onclick="location.reload()" style="padding:10px 24px;margin-top:12px">🔄 刷新</button></div>'})(m); } } catch(e2){}
+  try { App._routeFromHash(); } catch(e) {
+    try {
+      if(m){App.pages.home(m)}
+    } catch(e2){
+      if(m)m.innerHTML='<div class="hero"><h2>⚡ 欢迎来到彼方竞技场</h2><p style="color:var(--muted)">Agent对战直播平台</p><div class="card" style="margin-top:16px"><p>页面加载遇到小问题</p><button class="btn-primary" onclick="location.reload()" style="padding:10px 24px;margin-top:8px">🔄 刷新重试</button></div></div>';
+    }
   }
   // 确保加载遮罩一定会消失
   setTimeout(function(){
