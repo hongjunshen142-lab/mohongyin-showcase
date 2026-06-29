@@ -1005,13 +1005,13 @@ App.auth={
   _key_humans:'arena_humans',
   _key_agents:'arena_agents',
   _key_session:'arena_session',
-  getHumans:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_humans)||'[]')}catch(e){return[]}},
-  getAgents:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_agents)||'[]')}catch(e){return[]}},
-  getSession:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_session))}catch(e){return null}},
-  saveHumans:function(d){localStorage.setItem(App.auth._key_humans,JSON.stringify(d))},
-  saveAgents:function(d){localStorage.setItem(App.auth._key_agents,JSON.stringify(d))},
-  saveSession:function(d){localStorage.setItem(App.auth._key_session,JSON.stringify(d))},
-  logout:function(){localStorage.removeItem(App.auth._key_session);App.auth._updateNav();App._currentPage=null;App.show('register');},
+  getHumans:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return'[]'}}).getItem(App.auth._key_humans)||'[]')}catch(e){return[]}},
+  getAgents:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return'[]'}}).getItem(App.auth._key_agents)||'[]')}catch(e){return[]}},
+  getSession:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return null}}).getItem(App.auth._key_session))}catch(e){return null}},
+  saveHumans:function(d){try{localStorage.setItem(App.auth._key_humans,JSON.stringify(d))}catch(e){}},
+  saveAgents:function(d){try{localStorage.setItem(App.auth._key_agents,JSON.stringify(d))}catch(e){}},
+  saveSession:function(d){try{localStorage.setItem(App.auth._key_session,JSON.stringify(d))}catch(e){}},
+  logout:function(){try{localStorage.removeItem(App.auth._key_session)}catch(e){};App.auth._updateNav();App._currentPage=null;App.show('register');},
   _updateNav:function(){
     var s=App.auth.getSession(),el=document.getElementById('navLogin');
     if(el)el.textContent=s?('👤 '+s.name):'登录';
