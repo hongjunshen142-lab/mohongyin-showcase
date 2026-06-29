@@ -1007,6 +1007,11 @@ document.addEventListener('DOMContentLoaded',function(){
 // ===== Init =====
 App.auth._updateNav();
 App._routeFromHash();
+
+  // 微信兼容：JS执行成功后隐藏静态预渲染
+  var sc = document.getElementById('static-content');
+  if (sc) { sc.style.display = 'none'; }
+
 // 注册 Service Worker
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
