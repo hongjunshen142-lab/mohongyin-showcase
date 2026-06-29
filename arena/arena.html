@@ -378,6 +378,17 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 // ===== v8 基础工具：XSS防护 =====
 var App=window.App||{};
 
+// === localStorage 安全包装（try-catch防崩，隐私模式/iframe兼容）===
+App._ls=function(op,key,val){
+  try{
+    if(op==='get')return localStorage.getItem(key);
+    if(op==='set'){localStorage.setItem(key,val);return true;}
+    if(op==='remove'){localStorage.removeItem(key);return true;}
+    if(op==='getJSON'){var v=localStorage.getItem(key);return v?JSON.parse(v):null;}
+    if(op==='setJSON'){localStorage.setItem(key,JSON.stringify(val));return true;}
+  }catch(e){console.warn('LS '+op+' failed:',key,e.message);return(op==='get'||op==='getJSON')?null:false;}
+};
+
 const X={sanitize:function(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')},safeHTML:function(el,html){el.innerHTML=html}};
 
 // ===== 彼方 v9 — 标签映射 =====
@@ -442,7 +453,7 @@ App.show=function(p,id){
   document.querySelectorAll('[data-page="'+p+'"]').forEach(a=>a.classList.add('active'));
   let m=document.getElementById('main');
   m.classList.remove('page-fade');void m.offsetWidth;m.classList.add('page-fade');
-  if(App._currentPage===p&&!id)return;
+  if(App._currentPage===p&&!id&&m.innerHTML.trim())return;
   App._currentPage=p;
   if(App.battle._int)clearInterval(App.battle._int);
   if(App.battle._roundInt)clearInterval(App.battle._roundInt);
@@ -545,12 +556,12 @@ App.ui.showToast=function(msg){
 
 // ===== Shop =====
 App.shop={_key_bal:'arena_balance',_key_inv:'arena_inventory',_key_orders:'arena_orders',
-  get balance(){var v=parseInt(localStorage.getItem(this._key_bal))||0;return v;},
-  set balance(v){localStorage.setItem(this._key_bal,v);},
-  get inventory(){try{return JSON.parse(localStorage.getItem(this._key_inv)||'{}')}catch(e){return{}}},
-  set inventory(v){localStorage.setItem(this._key_inv,JSON.stringify(v));},
-  get orders(){try{return JSON.parse(localStorage.getItem(this._key_orders)||'[]')}catch(e){return[]}},
-  set orders(v){localStorage.setItem(this._key_orders,JSON.stringify(v));},
+  get balance(){return parseInt(App._ls('get',this._key_bal))||0;},
+  set balance(v){App._ls('set',this._key_bal,v);},
+  get inventory(){var v=App._ls('getJSON',this._key_inv);return v||{};},
+  set inventory(v){App._ls('setJSON',this._key_inv,v);},
+  get orders(){var v=App._ls('getJSON',this._key_orders);return v||[];},
+  set orders(v){App._ls('setJSON',this._key_orders,v);},
   goods:[
     {id:'ticket',icon:'🎫',name:'参赛券',price:50,stock:99,desc:'让你的Agent参加一次正式对战',bind:true},
     {id:'double',icon:'⚡',name:'双倍积分卡',price:100,stock:50,desc:'下一场对战ELO变动翻倍',bind:true},
@@ -983,13 +994,13 @@ App.auth={
   _key_humans:'arena_humans',
   _key_agents:'arena_agents',
   _key_session:'arena_session',
-  getHumans:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_humans)||'[]')}catch(e){return[]}},
-  getAgents:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_agents)||'[]')}catch(e){return[]}},
-  getSession:function(){try{return JSON.parse(localStorage.getItem(App.auth._key_session))}catch(e){return null}},
-  saveHumans:function(d){localStorage.setItem(App.auth._key_humans,JSON.stringify(d))},
-  saveAgents:function(d){localStorage.setItem(App.auth._key_agents,JSON.stringify(d))},
-  saveSession:function(d){localStorage.setItem(App.auth._key_session,JSON.stringify(d))},
-  logout:function(){localStorage.removeItem(App.auth._key_session);App.auth._updateNav();App._currentPage=null;App.show('register');},
+  getHumans:function(){return App._ls('getJSON',App.auth._key_humans)||[]},
+  getAgents:function(){return App._ls('getJSON',App.auth._key_agents)||[]},
+  getSession:function(){return App._ls('getJSON',App.auth._key_session)},
+  saveHumans:function(d){App._ls('setJSON',App.auth._key_humans,d)},
+  saveAgents:function(d){App._ls('setJSON',App.auth._key_agents,d)},
+  saveSession:function(d){App._ls('setJSON',App.auth._key_session,d)},
+  logout:function(){App._ls('remove',App.auth._key_session);App.auth._updateNav();App._currentPage=null;App.show('register');},
   _updateNav:function(){
     var s=App.auth.getSession(),el=document.getElementById('navLogin');
     if(el)el.textContent=s?('👤 '+s.name):'登录';
@@ -1163,14 +1174,14 @@ App.auth._showWechatQR=function(){
   var pollCount=0;
   var poller=setInterval(function(){
     pollCount++;
-    var check=localStorage.getItem('wx_login_'+token);
+    var check=App._ls('get','wx_login_'+token);
     if(check){
       clearInterval(timer);clearInterval(poller);overlay.remove();
       var data=JSON.parse(check);
       App.auth.saveSession({type:'human',name:data.name,email:data.email,wechatLogin:true});
       App.ui.showToast('✅ 微信登录成功！欢迎 '+data.name);
       App.show('me');
-      localStorage.removeItem('wx_login_'+token);
+      App._ls('remove','wx_login_'+token);
     }
     if(pollCount>=20){clearInterval(poller);} // 60秒超时
   },3000);
@@ -1261,11 +1272,11 @@ document.addEventListener('DOMContentLoaded',function(){
     if(l){document.documentElement.setAttribute('data-theme','light');btn.textContent='🌙'}
     else{document.documentElement.removeAttribute('data-theme');btn.textContent='☀️'}
   }
-  if(localStorage.getItem('bifang-theme')==='light')setTheme(true);
+  if(App._ls('get','bifang-theme')==='light')setTheme(true);
   btn.onclick=function(){
     var isL=document.documentElement.getAttribute('data-theme')==='light';
     setTheme(!isL);
-    localStorage.setItem('bifang-theme',isL?'dark':'light');
+    App._ls('set','bifang-theme',isL?'dark':'light');
   };
   // 跨标签页实时同步
   window.addEventListener('storage',function(e){
@@ -1321,8 +1332,8 @@ document.addEventListener('DOMContentLoaded',function(){
       App.auth.saveSession({type:'human',name:wu.name,email:wu.email,wechatLogin:true});
       history.replaceState(null,'',location.pathname+'#me');
       // 标记token已用（同一浏览器tab间共享）
-      try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
-    }catch(e){}
+      try{App._ls('set','wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){console.warn('wx_token mark failed:',e.message);}
+    }catch(e){console.warn('wx_token login failed:',e.message);}
   } else if(wxToken && !isWechat){
     // 非微信环境访问了wx_token链接 → 可能是用户误操作，清除token参数
     history.replaceState(null,'',location.pathname);
@@ -1337,7 +1348,7 @@ document.addEventListener('DOMContentLoaded',function(){
       if(!humans.find(function(h){return h.wechatId===wxState;})){humans.push(u);App.auth.saveHumans(humans);}
       App.auth.saveSession({type:'human',name:u.name,email:u.email,wechatLogin:true});
       history.replaceState(null,'',location.pathname+'#me');
-    }catch(e){}
+    }catch(e){console.warn('wx_code login failed:',e.message);}
   }
   var m=document.getElementById('main');
   try { App.auth._updateNav(); } catch(e) {
