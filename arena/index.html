@@ -405,6 +405,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </div>
 <script>
 // ===== v8 基础工具：XSS防护 =====
+var App=window.App||{};
+
 const X={sanitize:function(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')},safeHTML:function(el,html){el.innerHTML=html}};
 
 // ===== 彼方 v9 — 标签映射 =====
