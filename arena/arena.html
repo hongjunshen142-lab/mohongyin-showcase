@@ -1380,4 +1380,21 @@ document.addEventListener('DOMContentLoaded',function(){
   var sc = document.getElementById('static-content');
   if (sc) { sc.style.display = 'none'; }
 })();</script>
+<!-- v9.6.8-1 -->
+<script>
+(function(){
+  var v="v9.6.8-1";
+  console.log("%c彼方·竞技场 "+v,"color:#00cec9;font-size:16px");
+  var f=document.createElement("div");
+  f.style.cssText="position:fixed;bottom:4px;right:8px;z-index:9999;font-size:10px;color:rgba(255,255,255,.2);pointer-events:none";
+  f.textContent=v;
+  document.body.appendChild(f);
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){r.unregister();console.log("SW unregistered")});
+    });
+    caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})});
+  }
+})();
+</script>
 </body>
