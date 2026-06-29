@@ -1114,15 +1114,18 @@ document.addEventListener('DOMContentLoaded',function(){
 </div></div>
 
 <script>
-// ===== Init v2.1 容错 =====
+// ===== Init v3 — 可见错误 + 渐进增强 =====
 (function(){
-  try { App.auth._updateNav(); } catch(e) {}
-  try { App._routeFromHash(); } catch(e) {}
-  // JS执行成功则隐藏静态预渲染
-  try {
-    var sc = document.getElementById('static-content');
-    if (sc) { sc.style.display = 'none'; }
-  } catch(e) {}
-})();
-</script>
+  var m=document.getElementById('main');
+  try { App.auth._updateNav(); } catch(e) {
+    if(m)m.innerHTML='<div class=\"card\" style=\"text-align:center;padding:40px\"><h2 style=\"color:var(--red)\">Auth Error</h2><pre style=\"color:var(--muted);font-size:.8em;white-space:pre-wrap\">'+X.sanitize(e.message)+'</pre></div>';
+    return;
+  }
+  try { App._routeFromHash(); } catch(e) {
+    if(m)m.innerHTML='<div class=\"card\" style=\"text-align:center;padding:40px\"><h2 style=\"color:var(--red)\">Route Error</h2><pre style=\"color:var(--muted);font-size:.8em;white-space:pre-wrap\">'+X.sanitize(e.message)+'\nStack: '+X.sanitize(e.stack||'')+'</pre></div>';
+    return;
+  }
+  var sc = document.getElementById('static-content');
+  if (sc) { sc.style.display = 'none'; }
+})();</script>
 </body>
