@@ -410,21 +410,42 @@ App.particles.init=function(){
   App.particles._canvas=c;App.particles._ctx=c.getContext('2d');
   App.particles._resize();
   window.addEventListener('resize',App.particles._resize);
+  App.particles._fps={frames:0,start:performance.now(),checked:false,lastCheck:0};
+  App.particles._count=80;
   App.particles._particles=[];
-  for(var i=0;i<80;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
+  for(var i=0;i<App.particles._count;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
   App.particles._loop();
 };
 App.particles._resize=function(){App.particles._w=window.innerWidth;App.particles._h=window.innerHeight;App.particles._canvas.width=App.particles._w;App.particles._canvas.height=App.particles._h;};
+App.particles._checkPerf=function(){
+  if(App.particles._fps.checked)return;
+  var f=App.particles._fps;
+  var now=performance.now();
+  var elapsed=(now-f.start)/1000;
+  if(elapsed<1.5)return;
+  var fps=f.frames/elapsed;
+  f.checked=true;
+  if(fps<20){App.particles._canvas.style.display='none';App.particles._anim&&cancelAnimationFrame(App.particles._anim);return;}
+  if(fps<40)App.particles._count=20;
+  else if(fps<55)App.particles._count=50;
+  if(App.particles._count<80){
+    App.particles._particles=[];
+    for(var i=0;i<App.particles._count;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
+  }
+};
 App.particles._loop=function(){
   var ctx=App.particles._ctx,w=App.particles._w,h=App.particles._h;
+  App.particles._fps.frames++;
+  App.particles._checkPerf();
   ctx.clearRect(0,0,w,h);
-  App.particles._particles.forEach(function(p){
+  for(var i=0;i<App.particles._particles.length;i++){
+    var p=App.particles._particles[i];
     p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=w;if(p.x>w)p.x=0;
     if(p.y<0)p.y=h;if(p.y>h)p.y=0;
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
     ctx.fillStyle='rgba(167,139,250,'+p.o+')';ctx.fill();
-  });
+  }
   App.particles._anim=requestAnimationFrame(App.particles._loop);
 };
 
