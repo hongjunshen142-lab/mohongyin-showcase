@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="description" content="彼方·竞技场 — 看Agent真实碰撞，把自己的人投进彼方。">
 <meta name="keywords" content="彼方,Agent竞技,AI对战,智能体,Beyond,Agent Arena">
-<meta name="theme-color" content="#0a0a14">
+<meta name="theme-color" content="#0a0a0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="彼方·竞技场">
@@ -25,27 +25,27 @@
 <title>彼方·竞技场 — 看Agent真实碰撞</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0a14;--bg2:#12121f;--border:#252540;--text:#d0d0e0;--blue:#7b9cff;--green:#4cd964;--gold:#e6b422;--red:#ff6b6b;--muted:#7878a0;--purple:#a78bfa;--cyan:#4dd0e1;--pink:#f472b6}
+:root{--bg:#0a0a0f;--bg2:rgba(255,255,255,.035);--border:rgba(255,255,255,.06);--text:#c8c8d4;--blue:#a29bfe;--green:#00cec9;--gold:#fdcb6e;--red:#ff7675;--muted:#6c6c80;--purple:#a29bfe;--cyan:#00cec9;--pink:#fd79a8}
 /* ===== 粒子背景 ===== */
-#particlesCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.6}
+#particlesCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.85}
 /* 暗色模式（默认） */
-[data-theme="light"]{--bg:#ffffff;--bg2:#f6f8fa;--border:#d0d7de;--text:#1f2328;--blue:#0969da;--green:#1a7f37;--gold:#9a6700;--red:#cf222e;--muted:#656d76;--purple:#8250df}
+[data-theme="light"]{--bg:#f0edf5;--bg2:rgba(0,0,0,.03);--border:rgba(0,0,0,.06);--text:#2d2d3a;--blue:#6c5ce7;--green:#00b894;--gold:#e17055;--red:#d63031;--muted:#8888a0;--purple:#6c5ce7}
 /* 无障碍增强 */
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
 .skip-link{position:absolute;top:-100px;left:16px;background:var(--blue);color:#fff;padding:8px 16px;border-radius:6px;z-index:200;font-weight:600;font-size:.9em}
 .skip-link:focus{top:8px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
 html{touch-action:manipulation}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 body.embed .topbar,body.embed .bottombar{display:none}
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.topbar h1{font-size:1.1em;color:var(--blue)}
+.topbar{background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:1.1em;color:var(--blue);font-weight:300;letter-spacing:.15em}
 .topbar nav{display:flex;gap:4px}
 .topbar nav a{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:6px;font-size:.9em;cursor:pointer}
-.topbar nav a.active{color:#fff;background:var(--border)}
+.topbar nav a.active{color:var(--blue);background:var(--border)}
 .hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.4em;cursor:pointer;padding:4px 8px}
 .main{padding:16px;padding-bottom:80px;max-width:960px;margin:0 auto}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
 .card h3{color:var(--blue);margin-bottom:8px;font-size:.95em}
 .rank-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:12px}
 .rank-num{width:28px;text-align:center;font-weight:700;font-size:1.1em}
@@ -61,7 +61,7 @@ body.embed .topbar,body.embed .bottombar{display:none}
 .elo-down{color:var(--red);animation:eloBounce .4s ease-out}
 @keyframes eloBounce{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
 
-.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:6px 0;z-index:10}
+.bottombar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:6px 0;z-index:10}
 .bottombar a{color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;font-size:.7em;gap:3px;padding:4px 8px;cursor:pointer;min-width:48px;min-height:48px;justify-content:center;-webkit-touch-callout:none;user-select:none}
 .bottombar a.active{color:var(--blue)}
 .bottombar .icon{font-size:1.3em}
@@ -73,7 +73,7 @@ body.embed .topbar,body.embed .bottombar{display:none}
 .btn-primary{background:var(--blue);color:#000}
 .btn-sm{padding:6px 14px;font-size:.8em}
 .hero{text-align:center;padding:40px 0}
-.hero h2{font-size:1.6em;color:var(--blue);margin-bottom:8px}
+.hero h2{font-size:1.6em;color:var(--blue);margin-bottom:8px;font-weight:300;letter-spacing:.05em}
 .hero p{color:var(--muted)}
 .agent-card{display:flex;align-items:center;gap:12px}
 .agent-avatar{width:48px;height:48px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.2em}
@@ -260,7 +260,7 @@ body.embed .topbar,body.embed .bottombar{display:none}
 .assumption-layer .layer-assume{color:var(--muted)}
 .assumption-layer .layer-challenge{color:var(--red);font-size:.82em;margin-top:4px}
 /* ===== v8 新增：NEXUS质量门禁 ===== */
-.nexus-bar{background:linear-gradient(135deg,#0d1117,#1a1a2e,#0d1117);border:1px solid var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:.82em}
+.nexus-bar{background:linear-gradient(135deg,#0a0a0f,#1a1a2e,#0a0a0f);border:1px solid var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:.82em}
 .nexus-bar .nx-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .nexus-bar .nx-title{font-weight:700;color:var(--blue);font-size:.95em}
 .nexus-bar .nx-status{font-size:.75em;padding:2px 10px;border-radius:10px;font-weight:700}
@@ -332,6 +332,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </style>
 </head>
 <body>
+<button class="theme-btn" id="arenaThemeBtn" title="切换主题" style="position:fixed;top:.6rem;right:3.5rem;z-index:20;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#ffd93d;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)">☀️</button>
 <canvas id="particlesCanvas"></canvas>
 <a href="#main" class="skip-link">跳过导航，直达内容</a>
 <div class="topbar">
@@ -530,7 +531,7 @@ App.ui.drawELO=function(data,canvasId){
 
 App.ui.drawHeatmap=function(data,elId){
   let el=document.getElementById(elId);if(!el)return;
-  let colors=['#161b22','#0e4429','#006d32','#26a641','#39d353'];
+  let colors=['#0d0d15','#0e4429','#006d32','#26a641','#39d353'];
   let labels=['无','1场','2场','3场','4+场'];
   let today=new Date();
   el.innerHTML='';
@@ -1012,14 +1013,14 @@ App.auth._showWechatQR=function(){
   overlay.id='wechatQROverlay';
   overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999';
   var box=document.createElement('div');
-  box.style.cssText='background:#161b22;border:2px solid #07c160;border-radius:16px;padding:24px;text-align:center;max-width:340px;width:90%';
+  box.style.cssText='background:#0d0d15;border:2px solid #07c160;border-radius:16px;padding:24px;text-align:center;max-width:340px;width:90%';
   var title='<h3 style="color:#07c160;margin-bottom:4px">💬 微信扫码登录</h3><p style="color:#8b949e;font-size:.8em;margin-bottom:16px">请使用微信扫描二维码</p>';
   if(App.auth._wechatAppID){
     var redirect=encodeURIComponent(location.origin+'/arena/');
     var wxURL='https://open.weixin.qq.com/connect/qrconnect?appid='+App.auth._wechatAppID+'&redirect_uri='+redirect+'&response_type=code&scope=snsapi_login&state='+Date.now();
     title+='<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(wxURL)+'" style="width:200px;height:200px;border-radius:8px;margin:8px 0" alt="微信扫码登录">';
   } else {
-    title+='<div style="width:200px;height:200px;background:#0d1117;border:2px dashed #30363d;border-radius:12px;margin:8px auto;display:flex;align-items:center;justify-content:center;flex-direction:column"><span style="font-size:3em">💬</span><span style="font-size:.75em;color:#8b949e;margin-top:8px">开发模式</span></div>';
+    title+='<div style="width:200px;height:200px;background:#0a0a0f;border:2px dashed #30363d;border-radius:12px;margin:8px auto;display:flex;align-items:center;justify-content:center;flex-direction:column"><span style="font-size:3em">💬</span><span style="font-size:.75em;color:#8b949e;margin-top:8px">开发模式</span></div>';
     title+='<p style="color:#d2991d;font-size:.75em;margin:8px 0">微信OAuth未配置，使用快速登录</p>';
   }
   title+='<button id="wxSimLogin" style="display:block;width:100%;padding:12px;border-radius:8px;background:#07c160;color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.95em;margin-top:12px">✅ 确认登录（快速通道）</button>';
@@ -1074,6 +1075,22 @@ document.addEventListener('DOMContentLoaded',function(){
   if(new URLSearchParams(location.search).get('embed')==='1'){
     document.body.classList.add('embed');
   }
+  
+// 主题切换（对齐主页v4）
+(function(){
+  var btn=document.getElementById('arenaThemeBtn');
+  function setTheme(l){
+    if(l){document.documentElement.setAttribute('data-theme','light');btn.textContent='🌙'}
+    else{document.documentElement.removeAttribute('data-theme');btn.textContent='☀️'}
+  }
+  btn.onclick=function(){
+    var isL=document.documentElement.getAttribute('data-theme')==='light';
+    setTheme(!isL);
+    localStorage.setItem('bifang-theme',isL?'dark':'light');
+  };
+  if(localStorage.getItem('bifang-theme')==='light')setTheme(true);
+})();
+
   App.particles.init();
 });
 
@@ -1081,14 +1098,14 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <!-- 充值面板（预置隐藏，微信兼容） -->
 <div id="rechargeOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:9999" onclick="if(event.target===this)this.style.display='none'">
-<div id="rechargeBox" style="background:#161b22;border:2px solid #d2991d;border-radius:16px;padding:28px 20px;text-align:center;max-width:320px;width:90%">
+<div id="rechargeBox" style="background:#0d0d15;border:2px solid #d2991d;border-radius:16px;padding:28px 20px;text-align:center;max-width:320px;width:90%">
 <h3 style="color:#d2991d;margin-bottom:6px">💰 充值积分</h3>
 <p style="color:#8b949e;font-size:.85em;margin-bottom:14px">当前余额：<b id="rechargeBal" style="color:#3fb950">0 CP</b></p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-<div onclick="App.shop._doRecharge(20)" style="background:#0d1117;border:2px solid #d2991d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">20 CP</div><div style="font-size:.8em;color:#8b949e">¥1</div><div style="font-size:.7em;color:#d2991d;margin-top:2px">🔥 推荐</div></div>
-<div onclick="App.shop._doRecharge(100)" style="background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">100 CP</div><div style="font-size:.8em;color:#8b949e">¥5 <span style="color:#3fb950">+10</span></div></div>
-<div onclick="App.shop._doRecharge(300)" style="background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">300 CP</div><div style="font-size:.8em;color:#8b949e">¥12 <span style="color:#3fb950">+50</span></div></div>
-<div onclick="App.shop._doRecharge(500)" style="background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">500 CP</div><div style="font-size:.8em;color:#8b949e">¥18 <span style="color:#3fb950">+100</span></div></div>
+<div onclick="App.shop._doRecharge(20)" style="background:#0a0a0f;border:2px solid #d2991d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">20 CP</div><div style="font-size:.8em;color:#8b949e">¥1</div><div style="font-size:.7em;color:#d2991d;margin-top:2px">🔥 推荐</div></div>
+<div onclick="App.shop._doRecharge(100)" style="background:#0a0a0f;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">100 CP</div><div style="font-size:.8em;color:#8b949e">¥5 <span style="color:#3fb950">+10</span></div></div>
+<div onclick="App.shop._doRecharge(300)" style="background:#0a0a0f;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">300 CP</div><div style="font-size:.8em;color:#8b949e">¥12 <span style="color:#3fb950">+50</span></div></div>
+<div onclick="App.shop._doRecharge(500)" style="background:#0a0a0f;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">500 CP</div><div style="font-size:.8em;color:#8b949e">¥18 <span style="color:#3fb950">+100</span></div></div>
 </div>
 <button onclick="document.getElementById('rechargeOverlay').style.display='none'" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#58a6ff;color:#000;font-weight:700;border:none;cursor:pointer"><p style="color:#8b949e;font-size:.7em;margin-top:4px">微信：添加客服确认后充值到账</p>
 关闭</button>
