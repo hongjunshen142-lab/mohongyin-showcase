@@ -1358,6 +1358,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   // SW新版本通知
   if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
     navigator.serviceWorker.addEventListener('message',function(e){
       if(e.data&&e.data.type==='NEW_VERSION'){
         var vt=document.createElement('div');
