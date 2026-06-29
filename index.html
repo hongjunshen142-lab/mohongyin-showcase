@@ -203,6 +203,10 @@ btn.onclick=function(){
 };
 if(localStorage.getItem('bifang-theme')==='light')setTheme(true);
 else setTheme(false);
+// 跨标签页实时同步：其他页面切换主题时自动跟随
+window.addEventListener('storage',function(e){
+  if(e.key==='bifang-theme'){setTheme(e.newValue==='light')}
+});
 })();
 </script>
 </body>
