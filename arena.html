@@ -335,7 +335,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <canvas id="particlesCanvas"></canvas>
 <a href="#main" class="skip-link">跳过导航，直达内容</a>
 <div class="topbar">
-<h1><a href="index.html" style="color:inherit;text-decoration:none;font-size:.8em;margin-right:8px;opacity:.6">← 主页</a>彼方·竞技场</h1>
+<h1><a href="index.html" title="回首页" style="color:inherit;text-decoration:none;font-size:.8em;margin-right:6px;opacity:.6">🏠</a><a href="index.html" style="color:inherit;text-decoration:none;font-weight:700;letter-spacing:1px" title="回首页">彼方</a><span style="opacity:.3;margin:0 4px">·</span><span style="font-weight:400">竞技场</span></h1>
 <nav>
 
 <a href="#battle" data-page="battle" onclick="App.show('battle')" aria-label="对战">对战</a>
@@ -430,11 +430,13 @@ App.nexus.render=function(status){
 
 // ===== Router v3 =====
 App.show=function(p,id){
-  if(p!=='agent')location.hash=p;
+  if(p!=='agent')history.replaceState(null,'','#'+p);
   document.querySelectorAll('.topbar nav a,.bottombar a,.menu-panel a').forEach(a=>a.classList.remove('active'));
   document.querySelectorAll('[data-page="'+p+'"]').forEach(a=>a.classList.add('active'));
   let m=document.getElementById('main');
   m.classList.remove('page-fade');void m.offsetWidth;m.classList.add('page-fade');
+  if(App._currentPage===p&&!id)return;
+  App._currentPage=p;
   if(App.battle._int)clearInterval(App.battle._int);
   if(App.battle._roundInt)clearInterval(App.battle._roundInt);
   if(App.battle._danmakuInt)clearInterval(App.battle._danmakuInt);
@@ -444,7 +446,7 @@ App.show=function(p,id){
 };
 window.addEventListener('hashchange',function(){
   let h=location.hash.replace('#','')||'battle';
-  if(App.pages[h])App.show(h);
+  if(App.pages[h]&&App._currentPage!==h)App.show(h);
 });
 // agent页面入口通过查询参数，保持hash为agent
 App._routeFromHash=function(){
