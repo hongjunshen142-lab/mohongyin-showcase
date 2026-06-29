@@ -332,7 +332,6 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </style>
 </head>
 <body>
-<button class="theme-btn" id="arenaThemeBtn" title="切换主题" style="position:fixed;top:.6rem;right:3.5rem;z-index:20;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#ffd93d;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)">☀️</button>
 <canvas id="particlesCanvas"></canvas>
 <a href="#main" class="skip-link">跳过导航，直达内容</a>
 <div class="topbar">
@@ -1076,19 +1075,11 @@ document.addEventListener('DOMContentLoaded',function(){
     document.body.classList.add('embed');
   }
   
-// 主题切换（对齐主页v4）
+// 主题同步：跟随主页设定（只读localStorage，切换统一在主页操作）
 (function(){
-  var btn=document.getElementById('arenaThemeBtn');
-  function setTheme(l){
-    if(l){document.documentElement.setAttribute('data-theme','light');btn.textContent='🌙'}
-    else{document.documentElement.removeAttribute('data-theme');btn.textContent='☀️'}
+  if(localStorage.getItem('bifang-theme')==='light'){
+    document.documentElement.setAttribute('data-theme','light');
   }
-  btn.onclick=function(){
-    var isL=document.documentElement.getAttribute('data-theme')==='light';
-    setTheme(!isL);
-    localStorage.setItem('bifang-theme',isL?'dark':'light');
-  };
-  if(localStorage.getItem('bifang-theme')==='light')setTheme(true);
 })();
 
   App.particles.init();
