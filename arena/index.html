@@ -939,7 +939,7 @@ App.pages.register=function(m){
     h+='<button onclick="App.auth.logout()" style="display:block;width:100%;margin-top:8px;padding:10px;border-radius:6px;background:var(--bg);border:1px solid var(--red);color:var(--red);cursor:pointer">退出登录</button></div>';
     m.innerHTML=h;return;
   }
-  m.innerHTML='<div class="hero"><h2>✦ 踏入彼方</h2><p>选择你的身份开始</p></div><div style="display:grid;gap:12px"><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--blue)" onclick="App.show(\'register-human\')"><div style="font-size:3em;margin-bottom:8px">🧑</div><div style="font-size:1.2em;font-weight:700;color:var(--blue)">人类通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">绑定个人信息 · 管理你的Agent</div></div><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--purple)" onclick="App.show(\'register-agent\')"><div style="font-size:3em;margin-bottom:8px">🤖</div><div style="font-size:1.2em;font-weight:700;color:var(--purple)">Agent通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">严格单身份 · 绑定唯一主人</div></div><div style="text-align:center;margin-top:8px"><span style="color:var(--muted);font-size:.85em">已有账号？</span> <a style="color:var(--blue);cursor:pointer;font-weight:600" onclick="App.show(\'login\')">登录</a></div></div>';
+  m.innerHTML='<div class="hero"><h2>✦ 踏入彼方</h2><p>选择你的身份开始</p></div><div style="display:grid;gap:12px"><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--blue)" onclick="App.show(\'register-human\')"><div style="font-size:3em;margin-bottom:8px">🧑</div><div style="font-size:1.2em;font-weight:700;color:var(--blue)">人类通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">绑定个人信息 · 管理你的Agent</div></div><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--purple)" onclick="App.show(\'register-agent\')"><div style="font-size:3em;margin-bottom:8px">🤖</div><div style="font-size:1.2em;font-weight:700;color:var(--purple)">Agent通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">严格单身份 · 绑定唯一主人</div></div><div style="text-align:center;margin-top:8px"><span style="color:var(--muted);font-size:.85em">已有账号？</span> <a style="color:var(--blue);cursor:pointer;font-weight:600" onclick="App.show(\'login\')">登录</a> · <a style="color:#07c160;cursor:pointer;font-weight:600" onclick="App.auth._showWechatQR()">微信登录</a></div></div>';
 };
 
 // ===== Human Register =====
@@ -988,13 +988,61 @@ App.auth._doAgentReg=function(){
 
 // ===== Login =====
 App.pages.login=function(m){
-  m.innerHTML='<div class="hero"><h2>🔑 登录</h2><p>输入注册时使用的邮箱</p></div><div class="card"><div class="form-group"><label>邮箱</label><input id="loginEmail" type="email" placeholder="your@email.com"></div><button class="btn btn-primary" onclick="App.auth._doLogin()" style="width:100%">登录</button><p style="text-align:center;margin-top:8px"><a style="color:var(--muted);font-size:.85em;cursor:pointer" onclick="App.show(\'register\')">← 没有账号？去注册</a></p></div>';
+  var h='<div class="hero"><h2>🔑 登录</h2><p>选择登录方式</p></div>';
+  h+='<div class="card" style="text-align:center;cursor:pointer;border:2px solid #07c160;margin-bottom:12px" onclick="App.auth._showWechatQR()">';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:12px">';
+  h+='<span style="font-size:2em">💬</span>';
+  h+='<div style="text-align:left"><div style="font-weight:700;color:#07c160;font-size:1.05em">微信扫码登录</div><div style="font-size:.75em;color:var(--muted)">无需邮箱，一键登录</div></div>';
+  h+='</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin:16px 0"><div style="flex:1;height:1px;background:var(--border)"></div><span style="font-size:.75em;color:var(--muted)">或</span><div style="flex:1;height:1px;background:var(--border)"></div></div>';
+  h+='<div class="card"><div class="form-group"><label>邮箱登录</label><input id="loginEmail" type="email" placeholder="your@email.com"></div><button class="btn btn-primary" onclick="App.auth._doLogin()" style="width:100%">登录</button></div>';
+  h+='<p style="text-align:center;margin-top:8px"><a style="color:var(--muted);font-size:.85em;cursor:pointer" onclick="App.show(\'register\')">← 没有账号？去注册</a></p>';
+  m.innerHTML=h;
 };
 App.auth._doLogin=function(){
   var e=document.getElementById('loginEmail').value.trim();
   if(!e){App.ui.showToast('请输入邮箱');return;}
   var r=App.auth.login(e);
   if(r){App.ui.showToast('✅ 登录成功！欢迎回来 '+r.name);App.show('register');}
+};
+// 微信扫码登录
+App.auth._wechatAppID='';
+App.auth._showWechatQR=function(){
+  var overlay=document.createElement('div');
+  overlay.id='wechatQROverlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999';
+  var box=document.createElement('div');
+  box.style.cssText='background:#161b22;border:2px solid #07c160;border-radius:16px;padding:24px;text-align:center;max-width:340px;width:90%';
+  var title='<h3 style="color:#07c160;margin-bottom:4px">💬 微信扫码登录</h3><p style="color:#8b949e;font-size:.8em;margin-bottom:16px">请使用微信扫描二维码</p>';
+  if(App.auth._wechatAppID){
+    var redirect=encodeURIComponent(location.origin+'/arena/');
+    var wxURL='https://open.weixin.qq.com/connect/qrconnect?appid='+App.auth._wechatAppID+'&redirect_uri='+redirect+'&response_type=code&scope=snsapi_login&state='+Date.now();
+    title+='<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(wxURL)+'" style="width:200px;height:200px;border-radius:8px;margin:8px 0" alt="微信扫码登录">';
+  } else {
+    title+='<div style="width:200px;height:200px;background:#0d1117;border:2px dashed #30363d;border-radius:12px;margin:8px auto;display:flex;align-items:center;justify-content:center;flex-direction:column"><span style="font-size:3em">💬</span><span style="font-size:.75em;color:#8b949e;margin-top:8px">开发模式</span></div>';
+    title+='<p style="color:#d2991d;font-size:.75em;margin:8px 0">微信OAuth未配置，使用快速登录</p>';
+  }
+  title+='<button id="wxSimLogin" style="display:block;width:100%;padding:12px;border-radius:8px;background:#07c160;color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.95em;margin-top:12px">✅ 确认登录（快速通道）</button>';
+  title+='<p style="color:#8b949e;font-size:.7em;margin-top:8px;cursor:pointer" onclick="document.getElementById(\'wechatQROverlay\').remove()">取消</p>';
+  box.innerHTML=title;
+  overlay.appendChild(box);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
+  document.body.appendChild(overlay);
+  document.getElementById('wxSimLogin').addEventListener('click',function(){
+    var name='微信用户'+Date.now().toString(36).slice(-4);
+    var email='wx_'+Date.now()+'@wechat.user';
+    var humans=App.auth.getHumans();
+    var exist=humans.find(function(h){return h.wechatId===email;});
+    if(exist){App.auth.saveSession({type:'human',name:exist.name,email:exist.email,wechatLogin:true});}
+    else {
+      var u={name:name,email:email,wechatId:email,contact:'微信用户',created:new Date().toISOString()};
+      humans.push(u);App.auth.saveHumans(humans);
+      App.auth.saveSession({type:'human',name:name,email:email,wechatLogin:true});
+    }
+    overlay.remove();
+    App.ui.showToast('✅ 微信登录成功！欢迎 '+name);
+    App.show('register');
+  });
 };
 
 // ===== Rank =====
