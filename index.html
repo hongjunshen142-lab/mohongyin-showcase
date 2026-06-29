@@ -103,3 +103,8 @@ var a=ps[i],b=ps[j],dx=a.x-b.x,dy=a.y-b.y,dist=Math.sqrt(dx*dx+dy*dy);
 if(dist<100){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);
 x.strokeStyle='rgba(162,155,254,'+(.04*(1-dist/100))+')';x.stroke()}}}
 requestAnimationFrame(d)}
+d()
+})();
+</script>
+</body>
+</html>
