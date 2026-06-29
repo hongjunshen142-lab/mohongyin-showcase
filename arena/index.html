@@ -628,8 +628,6 @@ App.shop.buy=function(name,price,id){
   if(App.shop.balance<price){App.ui.showToast('积分不足！余额 '+App.shop.balance+'CP，需 '+price+'CP 💰');return;}
   App.shop.balance-=price;
   var inv=App.shop.inventory;inv[id]=(inv[id]||0)+1;App.shop.inventory=inv;
-  var item=App.shop._items.find(function(i){return i.id===id;});
-  if(item&&item.stock>0)item.stock--;
   App.shop.orders.push({id:id,name:name,price:price,time:new Date().toISOString()});
   App.shop.orders=App.shop.orders.slice(-50);
   App.ui.showToast('✅ 购买成功！'+name+' 已发放，背包查看 🎉');
@@ -913,14 +911,6 @@ App.battle._end=function(){
   let humanWin=D.current.votes.a1>=D.current.votes.a2?'a1':'a2';
   let aiScores=App.battle._genJudgeScores();App.battle._judgeScores=aiScores;
   let eloCh=Math.floor(Math.random()*15)+8;
-  var inv=App.shop.inventory;
-  if(inv.double>0){eloCh*=2;inv.double--;App.ui.showToast('⚡ 双倍积分卡生效！ELO ×2');}
-  if(inv.shield>0){
-    var session=App.auth.getSession();
-    var shielded=(humanWin==='a2'&&a1.ownerEmail===session.email)||(humanWin==='a1'&&a2.ownerEmail===session.email);
-    if(shielded){eloCh=0;inv.shield--;App.ui.showToast('🛡️ 保护盾生效！你的Agent本次不扣ELO');}
-  }
-  App.shop.inventory=inv;
   let tear=aiScores.winner!==humanWin;
   App.ui.showResult(humanWin,eloCh,tear,aiScores);App.battle._save({a1:D.current.a1,a2:D.current.a2,winner:humanWin,elo:eloCh});
   setTimeout(function(){
@@ -1424,24 +1414,18 @@ document.addEventListener('DOMContentLoaded',function(){
   var isWechat=/MicroMessenger/i.test(navigator.userAgent);
 
   if(wxToken && isWechat){
+    // 微信扫码后打开的页面 → 自动注册登录
     try{
-      var boundUser=JSON.parse(localStorage.getItem('arena_wechat_bound'));
-      if(boundUser){
-        App.auth.saveSession({type:'human',name:boundUser.name,email:boundUser.email,wechatLogin:true});
-        history.replaceState(null,'',location.pathname+'#me');
-        try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify(boundUser));}catch(e){}
-      } else {
-        var wname='微信用户'+Date.now().toString(36).slice(-4);
-        var wemail='wx_'+Date.now()+'@wechat.user';
-        var whumans=App.auth.getHumans();
-        var wu=whumans.find(function(h){return h.wechatId===wemail;}) || {name:wname,email:wemail,wechatId:wemail,contact:'微信扫码用户',created:new Date().toISOString()};
-        if(!whumans.find(function(h){return h.wechatId===wemail;})){whumans.push(wu);App.auth.saveHumans(whumans);}
-        App.auth.saveSession({type:'human',name:wu.name,email:wu.email,wechatLogin:true});
-        history.replaceState(null,'',location.pathname+'#me');
-        try{localStorage.setItem('arena_wechat_bound',JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
-        try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
-      }
-    }catch(e){console.warn('wx_token login failed:',e.message);}
+      var wname='微信用户'+Date.now().toString(36).slice(-4);
+      var wemail='wx_'+Date.now()+'@wechat.user';
+      var whumans=App.auth.getHumans();
+      var wu=whumans.find(function(h){return h.wechatId===wemail;}) || {name:wname,email:wemail,wechatId:wemail,contact:'微信扫码用户',created:new Date().toISOString()};
+      if(!whumans.find(function(h){return h.wechatId===wemail;})){whumans.push(wu);App.auth.saveHumans(whumans);}
+      App.auth.saveSession({type:'human',name:wu.name,email:wu.email,wechatLogin:true});
+      history.replaceState(null,'',location.pathname+'#me');
+      // 标记token已用（同一浏览器tab间共享）
+      try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
+    }catch(e){}
   } else if(wxToken && !isWechat){
     // 非微信环境访问了wx_token链接 → 可能是用户误操作，清除token参数
     history.replaceState(null,'',location.pathname);
