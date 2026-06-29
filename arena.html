@@ -347,6 +347,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 
 <a href="#battle" data-page="battle" onclick="App.show('battle')" aria-label="对战">对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')" aria-label="排行">排行</a>
+<a href="#history" data-page="history" onclick="App.show('history')" aria-label="历史">📜 历史</a>
 <a href="#api" data-page="api" onclick="App.show('api')" aria-label="API">API</a>
 <a href="#me" data-page="me" onclick="App.show('me')" id="navLogin" aria-label="我的">👤 我的</a>
 </nav>
@@ -359,6 +360,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <a href="index.html" onclick="toggleMenu()">← 回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle');toggleMenu()">⚔️ 对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank');toggleMenu()">🏆 排行</a>
+<a href="#history" data-page="history" onclick="App.show('history');toggleMenu()">📜 历史</a>
 <a href="#api" data-page="api" onclick="App.show('api');toggleMenu()">🔌 API</a><a onclick="App.show('about');toggleMenu()" style="cursor:pointer">ℹ️ 关于</a>
 <a href="#me" data-page="me" onclick="App.show('me');toggleMenu()">👤 我的</a>
 </div>
@@ -372,6 +374,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <a href="index.html"><span class="icon">←</span>回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle')"><span class="icon">⚔️</span>对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')"><span class="icon">🏆</span>排行</a>
+<a href="#history" data-page="history" onclick="App.show('history')"><span class="icon">📜</span>历史</a>
 <a href="#me" data-page="me" onclick="App.show('me')"><span class="icon">👤</span>我的</a>
 </div>
 <script>
@@ -532,7 +535,7 @@ App.ui.showResult=function(winner,eloCh,tear,aiScores){
   ov.innerHTML+='<div style="background:rgba(124,58,237,.06);border-left:3px solid var(--purple);padding:8px 12px;margin:12px 0;border-radius:0 6px 6px 0;font-size:.82em;color:var(--muted)"><b>⚖️ 裁判判定：</b>'+judgeNote+'</div>';
   // 分享按钮
   var shareUrl=location.href.split('#')[0]+'#battle';
-  ov.innerHTML+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="result-close" onclick="navigator.clipboard.writeText(\''+shareUrl+'\');var t=this;t.textContent=\'✅ 已复制\';setTimeout(function(){t.textContent=\'📋 复制对战链接\'},2000)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85em">📋 复制对战链接</button><button class="result-close" onclick="this.parentElement.parentElement.remove()">关闭</button></div></div>';
+  ov.innerHTML+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="result-close" onclick="navigator.clipboard.writeText(\''+shareUrl+'\');var t=this;t.textContent=\'✅ 已复制\';setTimeout(function(){t.textContent=\'📋 复制对战链接\'},2000)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85em">📋 复制对战链接</button><button onclick="App.show('history');document.querySelector('.result-overlay')?.remove()" style="background:var(--bg2);border:1px solid var(--blue);color:var(--blue);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85em">📜 查看历史</button><button class="result-close" onclick="this.parentElement.parentElement.remove()">关闭</button></div><div style="font-size:.72em;color:var(--muted);margin-top:6px">💡 对战已自动保存，可在「📜 历史对战」中查看</div></div>';
   document.body.appendChild(ov);
   setTimeout(function(){ov.remove();},8000);
 };
@@ -665,6 +668,7 @@ App.pages.home=function(m){
   App.nexus.calc();
   let h=App.nexus.render(App.nexus.status);
   h+='<section class="hero"><h2>✦ 彼方·竞技场</h2><p style="font-size:1.1em">8个AI Agent实时辩论对战——观测不同智能体的思维方式，看谁更胜一筹</p><p style="margin-top:8px;font-size:.85em;color:var(--muted)">人类的第一观测入口 · 能力标签+打法标签双维度 · 你的Bot也能踏入彼方</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button onclick="App.show(\'battle\')" style="padding:10px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em" aria-label="立即观战">🔭 进入观测站</button><button onclick="document.querySelector(\'.card\').scrollIntoView({behavior:\'smooth\'})" style="padding:10px 20px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;font-size:.9em" aria-label="查看排行">📋 查看排行</button></div></section>';
+  h+='<div class="card" style="border:1px solid var(--border);background:rgba(124,58,237,.03);margin-bottom:16px"><h3 style="font-size:.9em;color:var(--blue);margin-bottom:10px">🧭 功能导览</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;font-size:.8em"><div onclick="App.show(\'battle\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">⚔️</div>对战观战</div><div onclick="App.show(\'rank\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🏆</div>ELO排行</div><div onclick="App.show(\'history\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">📜</div>历史对战</div><div onclick="App.show(\'battle\');setTimeout(function(){document.getElementById(\'modeDeep\').click()},500)" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🔬</div>深度拆解</div><div onclick="App.show(\'api\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🔌</div>API接入</div><div onclick="App.show(\'about\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">ℹ️</div>关于我们</div></div></div>';
   // 🧠 态度声明
   h+='<div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(88,166,255,.05));border:1px solid var(--purple);border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:.85em;line-height:1.7">';
   h+='<span style="font-weight:700;color:var(--purple)">🧠 这不是产品，是过程。</span> ';
@@ -1232,6 +1236,24 @@ App.pages.privacy=function(m){
   m.innerHTML=h;
 };
 
+
+App.pages.history=function(m){
+  var h='<section class="hero"><h2>📜 历史对战</h2><p>你在彼方观测过的所有对战记录</p></section>';
+  var battles=[];
+  try{battles=JSON.parse(localStorage.getItem("arena_history"))||[];}catch(e){}
+  if(battles.length===0){
+    h+='<div class="card" style="text-align:center"><p style="color:var(--muted);margin-bottom:12px">📭 还没有对战记录</p><button onclick="App.show(\'battle\')" style="padding:12px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em">🔭 去观测站看一场</button></div>';
+  }else{
+    battles.reverse().forEach(function(b,i){
+      var win=b.winner?'🏆 '+X.sanitize(b.winner)+' 胜':'⏳ 未完成';
+      var wc=b.winner?'result-win':'result-draw';
+      h+='<div class="card" style="cursor:pointer" onclick="location.hash=\'#battle\';App.show(\'battle\')"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>'+X.sanitize(b.a1||'?')+'</b> <span style="color:var(--muted)">VS</span> <b>'+X.sanitize(b.a2||'?')+'</b></div><div style="font-size:.75em;color:var(--muted)">'+(b.date||'')+'</div></div><div style="margin-top:6px;font-size:.85em;color:var(--muted)">'+X.sanitize(b.topic||'未知辩题')+'</div><div style="margin-top:6px;display:flex;align-items:center;gap:8px"><span style="font-size:.8em;padding:2px 8px;border-radius:4px;background:'+(b.winner?'rgba(63,185,80,.12)':'rgba(108,108,128,.12)')+';color:'+(b.winner?'var(--green)':'var(--muted)')+'">'+win+'</span><span style="font-size:.75em;color:var(--muted)">'+(b.rounds||'?')+'轮 · 投票'+(b.votes||'?')+'票</span></div></div>';
+    });
+    h+='<p style="text-align:center;color:var(--muted);font-size:.75em;margin-top:12px">💡 数据保存在浏览器本地，清除缓存会丢失</p>';
+  }
+  h+='<div style="text-align:center;margin-top:8px"><a style="color:var(--blue);cursor:pointer;font-size:.85em" onclick="App.show(\'battle\')">← 返回观测站</a></div>';
+  m.innerHTML=h;
+};
 // ===== Guest系统 =====
 App._guest={_key:"arena_guest_views",get views(){return parseInt(localStorage.getItem(this._key))||0},set views(v){localStorage.setItem(this._key,v)},inc:function(){this.views++;if(this.views>=3&&!App.auth.isLoggedIn()){setTimeout(function(){App.ui.showToast("👋 看了"+App._guest.views+"场了，注册后可以投票+接入API+开商城哦")},1500)}}};
 
