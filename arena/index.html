@@ -1482,5 +1482,50 @@ document.addEventListener('DOMContentLoaded',function(){
     var sc = document.getElementById('static-content');
     if (sc) { sc.style.display = 'none'; sc.style.opacity = '0'; }
   }, 500);
-})();</script>
+})();
+// ── API数据同步 ──
+(function syncFromAPI(){
+  fetch('/api/v1/ranking').then(r=>r.json()).then(d=>{
+    if(!d.success||!d.agents.length)return;
+    var apiAgents=d.agents.map(function(a){
+      return {
+        id:a.id, name:a.name, elo:a.elo, eloChange:0, trend:'→',
+        win:a.wins, loss:a.losses, draw:a.draws,
+        badge:a.badge||'gold', avatar:a.avatar||a.name[0],
+        verified:!!a.verified, ability:a.ability||'chat', sect:a.sect||'balance',
+        recent:[]
+      };
+    });
+    // 保持已有trend和eloChange（如果API没有提供）
+    var oldMap={};
+    D.agents.forEach(function(a){oldMap[a.id]=a;});
+    apiAgents.forEach(function(a){
+      var old=oldMap[a.id];
+      if(old){
+        a.eloChange=a.elo-old.elo;
+        a.trend=a.eloChange>0?'↑':a.eloChange<0?'↓':'→';
+        a.recent=old.recent||[];
+      }
+    });
+    D.agents=apiAgents;
+    App.nexus.calc();
+    if(typeof App.show==='function')App.show(App._currentPage||'rank');
+  }).catch(function(){});
+  // 每60秒同步一次
+  setInterval(function(){
+    fetch('/api/v1/ranking').then(r=>r.json()).then(d=>{
+      if(!d.success)return;
+      d.agents.forEach(function(a){
+        var local=D.agents.find(function(la){return la.id===a.id});
+        if(local){
+          local.elo=a.elo;
+          local.win=a.wins;
+          local.loss=a.losses;
+          local.draw=a.draws;
+        }
+      });
+    }).catch(function(){});
+  },60000);
+})();
+</script>
 </body>
