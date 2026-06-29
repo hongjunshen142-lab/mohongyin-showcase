@@ -648,7 +648,7 @@ App.pages.home=function(m){
   h+='<div onclick="App.shop._doRecharge(100);this.parentElement.parentElement.style.display=\'none\'" style="background:var(--bg2);border:2px solid #30363d;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer"><div style="font-size:1.1em;font-weight:700;color:#58a6ff">100 CP</div><div style="font-size:.8em;color:#8b949e">¥5 +10</div></div>';
   h+='<div onclick="App.shop._doRecharge(300);this.parentElement.parentElement.style.display=\'none\'" style="background:var(--bg2);border:2px solid #30363d;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer"><div style="font-size:1.1em;font-weight:700;color:#58a6ff">300 CP</div><div style="font-size:.8em;color:#8b949e">¥12 +50</div></div>';
   h+='<div onclick="App.shop._doRecharge(500);this.parentElement.parentElement.style.display=\'none\'" style="background:var(--bg2);border:2px solid #30363d;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer"><div style="font-size:1.1em;font-weight:700;color:#58a6ff">500 CP</div><div style="font-size:.8em;color:#8b949e">¥18 +100</div></div>';
-  h+='</div><p style="color:var(--muted);font-size:.7em;margin-top:8px">演示模式 · 支付接口待配置</p></div></div>';
+  h+='</div><p style="color:var(--muted);font-size:.7em;margin-top:8px">💳 微信扫码支付 · 支付后联系客服确认到账</p></div></div>';
   // 最近对战
   let recentBattles=[];
   D.agents.forEach(a=>{let ad=A[a.id];if(ad)ad.history.slice(0,3).forEach(h2=>recentBattles.push({a:a.name,vs:h2.vs,result:h2.result,date:h2.date}));});
@@ -1040,8 +1040,9 @@ document.addEventListener('DOMContentLoaded',function(){
 <div onclick="App.shop._doRecharge(300)" style="background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">300 CP</div><div style="font-size:.8em;color:#8b949e">¥12 <span style="color:#3fb950">+50</span></div></div>
 <div onclick="App.shop._doRecharge(500)" style="background:#0d1117;border:2px solid #30363d;border-radius:10px;padding:12px 8px;cursor:pointer"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">500 CP</div><div style="font-size:.8em;color:#8b949e">¥18 <span style="color:#3fb950">+100</span></div></div>
 </div>
-<button onclick="document.getElementById('rechargeOverlay').style.display='none'" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#58a6ff;color:#000;font-weight:700;border:none;cursor:pointer">关闭</button>
-<p style="color:#8b949e;font-size:.7em;margin-top:8px">演示模式 · 支付接口待配置</p>
+<button onclick="document.getElementById('rechargeOverlay').style.display='none'" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#58a6ff;color:#000;font-weight:700;border:none;cursor:pointer"><p style="color:#8b949e;font-size:.7em;margin-top:4px">微信：添加客服确认后充值到账</p>
+关闭</button>
+<p style="color:#8b949e;font-size:.7em;margin-top:8px">💳 微信扫码支付 · 支付后联系客服确认到账</p>
 </div></div>
 
 <script>
