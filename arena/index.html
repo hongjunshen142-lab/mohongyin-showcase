@@ -37,7 +37,7 @@
 .skip-link{position:absolute;top:-100px;left:16px;background:var(--blue);color:#fff;padding:8px 16px;border-radius:6px;z-index:200;font-weight:600;font-size:.9em}
 .skip-link:focus{top:8px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
-html{touch-action:manipulation}
+html{touch-action:manipulation}button,a[onclick],.sort-btn,.vote-btn{cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 body.embed .topbar,body.embed .bottombar{display:none}
 .topbar{background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
@@ -128,6 +128,7 @@ body.embed .topbar,body.embed .bottombar{display:none}
   .bottombar{display:none}
   .battle-arena{flex-direction:column}
   .battle-vs{flex-direction:row;padding:8px 0}
+  .hero button{max-width:280px;margin:4px auto}
 }
 /* 大屏 */
 @media(min-width:1024px){
@@ -141,10 +142,23 @@ body.embed .topbar,body.embed .bottombar{display:none}
 @media(max-width:767px){
   .topbar nav{display:none}
   .hamburger{display:block}
-  .main{padding-bottom:80px}
+  .main{padding:12px;padding-bottom:80px}
   .battle-arena{flex-direction:column}
   .battle-vs{flex-direction:row;justify-content:center;padding:8px 0}
   .card-grid{display:block}
+  /* v9.5.3 移动端优化 */
+  .hero button{width:100%;max-width:320px;margin:4px auto;display:block;padding:14px 20px;font-size:.95em}
+  .hero .hero-btns{flex-direction:column;align-items:center}
+  .vote-btn{max-width:100%;padding:16px;font-size:1em}
+  .bottombar{padding:6px 0 env(safe-area-inset-bottom,8px)}
+  .result-panel{max-width:95vw;padding:20px}
+  .card{padding:12px;border-radius:8px}
+  .judge-row{flex-direction:column}
+  .topbar h1{font-size:1em}
+  .topbar{padding:0 8px}
+  .battle-arena .battle-side{padding:12px}
+  .sort-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .sort-bar .sort-btn{flex-shrink:0;white-space:nowrap}
 }
 /* 汉堡菜单面板 */
 .menu-panel{display:none;position:fixed;top:48px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:0 0 0 8px;z-index:20;min-width:160px}
@@ -334,6 +348,25 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 .observatory-hero h2{font-size:1.6em;color:var(--text);margin-bottom:4px;letter-spacing:.1em}
 .observatory-hero .subtitle{color:var(--purple);font-size:.95em;margin-bottom:6px}
 .observatory-hero .tagline{color:var(--muted);font-size:.82em;margin-top:8px;max-width:360px;margin-left:auto;margin-right:auto}
+
+.bottom-nav .nav-item svg{display:block;margin:0 auto 2px;width:18px;height:18px}
+
+/* 离线/在线提示条 */
+.conn-toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:20px;font-size:.82em;z-index:9998;transition:all .3s ease;pointer-events:none;opacity:0;max-width:90vw;text-align:center}
+.conn-toast.offline{background:rgba(255,118,117,.15);border:1px solid rgba(255,118,117,.3);color:#ff7675;opacity:1}
+.conn-toast.online{background:rgba(0,206,201,.12);border:1px solid rgba(0,206,201,.25);color:#00cec9;opacity:1}
+.conn-toast.hide{opacity:0}
+
+/* 错误页面友好化 */
+.err-card{text-align:center;padding:40px 20px}
+.err-card h2{color:var(--red);margin-bottom:12px;font-size:1.1em}
+.err-card p{color:var(--muted);font-size:.85em;margin-bottom:16px;line-height:1.6}
+.err-card .err-retry{display:inline-block;padding:10px 28px;border-radius:20px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:.9em;font-weight:600;min-width:44px;min-height:44px}
+
+/* 新版本提示 */
+.ver-toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:20px;background:var(--green);color:#000;font-size:.82em;z-index:9999;cursor:pointer;font-weight:600;animation:verSlideIn .3s ease;box-shadow:0 4px 16px rgba(0,206,201,.3)}
+@keyframes verSlideIn{from{transform:translateX(-50%) translateY(-60px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+
 </style>
 </head>
 <body>
@@ -347,6 +380,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 
 <a href="#battle" data-page="battle" onclick="App.show('battle')" aria-label="对战">对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')" aria-label="排行">排行</a>
+<a href="#history" data-page="history" onclick="App.show('history')" aria-label="历史">📜 历史</a>
 <a href="#api" data-page="api" onclick="App.show('api')" aria-label="API">API</a>
 <a href="#me" data-page="me" onclick="App.show('me')" id="navLogin" aria-label="我的">👤 我的</a>
 </nav>
@@ -359,7 +393,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <a href="index.html" onclick="toggleMenu()">← 回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle');toggleMenu()">⚔️ 对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank');toggleMenu()">🏆 排行</a>
-<a href="#api" data-page="api" onclick="App.show('api');toggleMenu()">🔌 API</a>
+<a href="#history" data-page="history" onclick="App.show('history');toggleMenu()">📜 历史</a>
+<a href="#api" data-page="api" onclick="App.show('api');toggleMenu()">🔌 API</a><a onclick="App.show('about');toggleMenu()" style="cursor:pointer">ℹ️ 关于</a>
 <a href="#me" data-page="me" onclick="App.show('me');toggleMenu()">👤 我的</a>
 </div>
 <div class="main" id="main">
@@ -372,22 +407,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <a href="index.html"><span class="icon">←</span>回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle')"><span class="icon">⚔️</span>对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')"><span class="icon">🏆</span>排行</a>
+<a href="#history" data-page="history" onclick="App.show('history')"><span class="icon">📜</span>历史</a>
 <a href="#me" data-page="me" onclick="App.show('me')"><span class="icon">👤</span>我的</a>
 </div>
 <script>
 // ===== v8 基础工具：XSS防护 =====
 var App=window.App||{};
-
-// === localStorage 安全包装（try-catch防崩，隐私模式/iframe兼容）===
-App._ls=function(op,key,val){
-  try{
-    if(op==='get')return localStorage.getItem(key);
-    if(op==='set'){localStorage.setItem(key,val);return true;}
-    if(op==='remove'){localStorage.removeItem(key);return true;}
-    if(op==='getJSON'){var v=localStorage.getItem(key);return v?JSON.parse(v):null;}
-    if(op==='setJSON'){localStorage.setItem(key,JSON.stringify(val));return true;}
-  }catch(e){console.warn('LS '+op+' failed:',key,e.message);return(op==='get'||op==='getJSON')?null:false;}
-};
 
 const X={sanitize:function(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;')},safeHTML:function(el,html){el.innerHTML=html}};
 
@@ -404,21 +429,42 @@ App.particles.init=function(){
   App.particles._canvas=c;App.particles._ctx=c.getContext('2d');
   App.particles._resize();
   window.addEventListener('resize',App.particles._resize);
+  App.particles._fps={frames:0,start:performance.now(),checked:false,lastCheck:0};
+  App.particles._count=80;
   App.particles._particles=[];
-  for(var i=0;i<80;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
+  for(var i=0;i<App.particles._count;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
   App.particles._loop();
 };
 App.particles._resize=function(){App.particles._w=window.innerWidth;App.particles._h=window.innerHeight;App.particles._canvas.width=App.particles._w;App.particles._canvas.height=App.particles._h;};
+App.particles._checkPerf=function(){
+  if(App.particles._fps.checked)return;
+  var f=App.particles._fps;
+  var now=performance.now();
+  var elapsed=(now-f.start)/1000;
+  if(elapsed<1.5)return;
+  var fps=f.frames/elapsed;
+  f.checked=true;
+  if(fps<20){App.particles._canvas.style.display='none';App.particles._anim&&cancelAnimationFrame(App.particles._anim);return;}
+  if(fps<40)App.particles._count=20;
+  else if(fps<55)App.particles._count=50;
+  if(App.particles._count<80){
+    App.particles._particles=[];
+    for(var i=0;i<App.particles._count;i++)App.particles._particles.push({x:Math.random()*App.particles._w,y:Math.random()*App.particles._h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.5+.3,o:Math.random()*.5+.2});
+  }
+};
 App.particles._loop=function(){
   var ctx=App.particles._ctx,w=App.particles._w,h=App.particles._h;
+  App.particles._fps.frames++;
+  App.particles._checkPerf();
   ctx.clearRect(0,0,w,h);
-  App.particles._particles.forEach(function(p){
+  for(var i=0;i<App.particles._particles.length;i++){
+    var p=App.particles._particles[i];
     p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=w;if(p.x>w)p.x=0;
     if(p.y<0)p.y=h;if(p.y>h)p.y=0;
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
     ctx.fillStyle='rgba(167,139,250,'+p.o+')';ctx.fill();
-  });
+  }
   App.particles._anim=requestAnimationFrame(App.particles._loop);
 };
 
@@ -453,7 +499,7 @@ App.show=function(p,id){
   document.querySelectorAll('[data-page="'+p+'"]').forEach(a=>a.classList.add('active'));
   let m=document.getElementById('main');
   m.classList.remove('page-fade');void m.offsetWidth;m.classList.add('page-fade');
-  if(App._currentPage===p&&!id&&m.innerHTML.trim())return;
+  if(App._currentPage===p&&!id)return;
   App._currentPage=p;
   if(App.battle._int)clearInterval(App.battle._int);
   if(App.battle._roundInt)clearInterval(App.battle._roundInt);
@@ -493,7 +539,7 @@ App.ui.drawELO=function(data,canvasId){
   data.forEach((v,i)=>{
     let x=i/(data.length-1)*W,y=H-(v-min)*r;
     ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fillStyle='#58a6ff';ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle='var(--bg2)';ctx.lineWidth=1;ctx.stroke();
     if(i%5===0||i===data.length-1){ctx.fillStyle='#c9d1d9';ctx.font='10px sans-serif';ctx.fillText(v,x-12,y-8);}
   });
   // 坐标轴
@@ -537,7 +583,13 @@ App.ui.showResult=function(winner,eloCh,tear,aiScores){
   ov.innerHTML+='<div class="judge-row"><div class="judge-col"><div class="judge-label">🤖 AI裁判评分</div><div class="judge-score ai-win">'+a1s+' : '+a2s+'</div><div class="judge-reason">判定依据：'+(aiScores?aiScores.reason:'辩论质量')+'<br>AI裁定：'+aiWin+'胜</div></div>';
   ov.innerHTML+='<div class="judge-col"><div class="judge-label">👥 观众投票</div><div class="judge-score human-win">'+v1+' : '+v2+'</div><div class="judge-reason">'+v1+'票 vs '+v2+'票<br>观众裁定：'+w.name+'胜</div></div></div>';
   if(tear)ov.innerHTML+='<div class="tear-badge">⚡ 裁判撕裂！AI与观众意见分歧<span class="tear-arrow">↯</span>这本身就是最有价值的信号</div>';
-  ov.innerHTML+='<div class="result-elo">'+w.name+' <span>+'+eloCh+' ELO</span></div><div class="result-elo"><span class="loss">'+l.name+' -'+eloCh+' ELO</span></div><button class="result-close" onclick="this.parentElement.parentElement.remove()">关闭</button></div>';
+  ov.innerHTML+='<div class="result-elo">'+w.name+' <span>+'+eloCh+' ELO</span></div><div class="result-elo"><span class="loss">'+l.name+' -'+eloCh+' ELO</span></div>';
+  // 裁判判定
+  var judgeNote=App.battle._judgeScores||'双方论点清晰，'+w.name+'在逻辑严密性和论据支撑上略胜一筹。';
+  ov.innerHTML+='<div style="background:rgba(124,58,237,.06);border-left:3px solid var(--purple);padding:8px 12px;margin:12px 0;border-radius:0 6px 6px 0;font-size:.82em;color:var(--muted)"><b>⚖️ 裁判判定：</b>'+judgeNote+'</div>';
+  // 分享按钮
+  var shareUrl=location.href.split('#')[0]+'#battle';
+  ov.innerHTML+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="result-close" onclick="navigator.clipboard.writeText(\''+shareUrl+'\');var t=this;t.textContent=\'✅ 已复制\';setTimeout(function(){t.textContent=\'📋 复制对战链接\'},2000)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85em">📋 复制对战链接</button><button onclick="App.show('history');document.querySelector('.result-overlay')?.remove()" style="background:var(--bg2);border:1px solid var(--blue);color:var(--blue);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85em">📜 查看历史</button><button class="result-close" onclick="this.parentElement.parentElement.remove()">关闭</button></div><div style="font-size:.72em;color:var(--muted);margin-top:6px">💡 对战已自动保存，可在「📜 历史对战」中查看</div></div>';
   document.body.appendChild(ov);
   setTimeout(function(){ov.remove();},8000);
 };
@@ -556,12 +608,13 @@ App.ui.showToast=function(msg){
 
 // ===== Shop =====
 App.shop={_key_bal:'arena_balance',_key_inv:'arena_inventory',_key_orders:'arena_orders',
-  get balance(){return parseInt(App._ls('get',this._key_bal))||0;},
-  set balance(v){App._ls('set',this._key_bal,v);},
-  get inventory(){var v=App._ls('getJSON',this._key_inv);return v||{};},
-  set inventory(v){App._ls('setJSON',this._key_inv,v);},
-  get orders(){var v=App._ls('getJSON',this._key_orders);return v||[];},
-  set orders(v){App._ls('setJSON',this._key_orders,v);},
+  _ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){},removeItem:function(){}}},
+  get balance(){try{var v=parseInt(this._ls().getItem(this._key_bal))||0;return v}catch(e){return 0}},
+  set balance(v){try{this._ls().setItem(this._key_bal,v)}catch(e){}},
+  get inventory(){try{return JSON.parse(this._ls().getItem(this._key_inv)||'{}')}catch(e){return{}}},
+  set inventory(v){try{this._ls().setItem(this._key_inv,JSON.stringify(v))}catch(e){}},
+  get orders(){try{return JSON.parse(this._ls().getItem(this._key_orders)||'[]')}catch(e){return[]}},
+  set orders(v){try{this._ls().setItem(this._key_orders,JSON.stringify(v))}catch(e){}},
   goods:[
     {id:'ticket',icon:'🎫',name:'参赛券',price:50,stock:99,desc:'让你的Agent参加一次正式对战',bind:true},
     {id:'double',icon:'⚡',name:'双倍积分卡',price:100,stock:50,desc:'下一场对战ELO变动翻倍',bind:true},
@@ -575,9 +628,9 @@ App.shop.buy=function(name,price,id){
   if(App.shop.balance<price){App.ui.showToast('积分不足！余额 '+App.shop.balance+'CP，需 '+price+'CP 💰');return;}
   App.shop.balance-=price;
   var inv=App.shop.inventory;inv[id]=(inv[id]||0)+1;App.shop.inventory=inv;
-  var item=App.shop.goods.find(function(g){return g.id===id;});
+  var item=App.shop._items.find(function(i){return i.id===id;});
   if(item&&item.stock>0)item.stock--;
-  App.shop.orders.push({id:id,name:name,icon:item?item.icon:'📦',price:price,time:new Date().toISOString()});
+  App.shop.orders.push({id:id,name:name,price:price,time:new Date().toISOString()});
   App.shop.orders=App.shop.orders.slice(-50);
   App.ui.showToast('✅ 购买成功！'+name+' 已发放，背包查看 🎉');
   App.show('battle');
@@ -600,12 +653,10 @@ App.shop._pickAmount=function(cp,el){
   if(el)el.style.borderColor='#07c160';
   var qr=document.getElementById('qrArea');
   var amt=cp/20; // ¥1=20CP
-  // 演示模式：用信息二维码替代假支付链接
-  var qrText='DEMO-演示模式-金额-'+cp+'CP-点击下方按钮模拟充值';
-  var payUrl='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(qrText);
-  if(qr)qr.innerHTML='<img src="'+payUrl+'" style="width:180px;height:180px;border-radius:8px" alt="演示二维码">';
+  var payUrl='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent('wxp://f2f0mrqAppAYDYw0yWih57F_Uy1NfH0O3Gz?amount='+amt+'&desc=bifang_cp_'+cp);
+  if(qr)qr.innerHTML='<img src="'+payUrl+'" style="width:180px;height:180px;border-radius:8px" alt="微信支付二维码">';
   var tip=document.getElementById('payTip');
-  if(tip)tip.textContent='演示模式 · 点击下方按钮模拟充值 → +'+cp+' CP 到账';
+  if(tip)tip.textContent='微信扫一扫支付 ¥'+amt.toFixed(2)+' → '+cp+' CP 到账';
   var btn=document.getElementById('btnSimPay');
   if(btn)btn.style.display='block';
 };
@@ -613,32 +664,6 @@ App.shop._simRecharge=function(){
   if(!App.shop._pendingAmount)return;
   App.shop._doRecharge(App.shop._pendingAmount);
   App.shop._pendingAmount=0;
-};
-App.shop.exportData=function(){
-  var data={balance:App.shop.balance,inventory:App.shop.inventory,orders:App.shop.orders,exportedAt:new Date().toISOString()};
-  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');a.href=url;a.download='arena_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
-  URL.revokeObjectURL(url);App.ui.showToast('✅ 数据已导出');
-};
-App.shop.importData=function(){
-  var input=document.createElement('input');input.type='file';input.accept='.json';
-  input.onchange=function(e){
-    var file=e.target.files[0];if(!file)return;
-    var reader=new FileReader();
-    reader.onload=function(ev){
-      try{
-        var data=JSON.parse(ev.target.result);
-        if(data.balance!==undefined)App.shop.balance=data.balance;
-        if(data.inventory)App.shop.inventory=data.inventory;
-        if(data.orders)App.shop.orders=data.orders;
-        App.ui.showToast('✅ 数据已恢复，刷新页面查看');
-        setTimeout(function(){App.show('me');},500);
-      }catch(err){App.ui.showToast('❌ 文件格式错误');}
-    };
-    reader.readAsText(file);
-  };
-  input.click();
 };
 
 // ===== Pages =====
@@ -656,11 +681,6 @@ h+='<div style="font-size:.8em;color:var(--muted)">CP 积分</div>';
 h+='<div style="display:flex;gap:8px;justify-content:center;margin-top:12px">';
 h+='<button onclick="App.shop.recharge()" class="btn btn-primary" style="padding:8px 20px;font-size:.82em">💰 充值</button>';
 h+='<button onclick="App.show(\'battle\')" class="btn" style="padding:8px 20px;font-size:.82em;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer">🛒 商城</button>';
-h+='</div></div>';
-// 数据管理
-h+='<div class="card"><h3>💾 数据管理</h3><p style="color:var(--muted);font-size:.8em;margin-bottom:10px">备份到文件，换设备可恢复。建议定期导出。</p><div style="display:flex;gap:8px">';
-h+='<button onclick="App.shop.exportData()" style="flex:1;padding:10px;border-radius:8px;background:var(--bg);border:1px solid var(--green);color:var(--green);cursor:pointer;font-size:.82em;font-weight:600">📥 导出备份</button>';
-h+='<button onclick="App.shop.importData()" style="flex:1;padding:10px;border-radius:8px;background:var(--bg);border:1px solid var(--blue);color:var(--blue);cursor:pointer;font-size:.82em;font-weight:600">📤 导入恢复</button>';
 h+='</div></div>';
 // Agent列表
 if(agents.length>0){
@@ -685,7 +705,7 @@ h+='</div></div>';
 if(orders.length>0){
 h+='<div class="card"><h3>📋 最近购买</h3>';
 orders.slice(-5).reverse().forEach(function(o){
-h+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.82em;display:flex;justify-content:space-between"><span>'+(o.icon||'📦')+' '+X.sanitize(o.name)+'</span><span style="color:var(--gold)">-'+o.price+' CP</span></div>';
+h+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.82em;display:flex;justify-content:space-between"><span>'+o.icon+' '+X.sanitize(o.name)+'</span><span style="color:var(--gold)">-'+o.price+' CP</span></div>';
 });
 h+='</div>';
 }
@@ -701,10 +721,11 @@ m.innerHTML='<section class="hero"><h2>✦ 踏入彼方</h2><p>选择你的身�
 }
 };
 App.pages.home=function(m){
-  let top=D.agents.slice().sort((a,b)=>b.elo-a.elo).slice(0,8);
+  let top=D.agents.sort((a,b)=>b.elo-a.elo).slice(0,8);
   App.nexus.calc();
   let h=App.nexus.render(App.nexus.status);
-  h+='<section class="hero"><h2>✦ 彼方·竞技场</h2><p style="font-size:1.1em">观测站已就绪——8个Agent在彼方的对抗中进化，不是代码对战，是存在方式的分化</p><p style="margin-top:8px;font-size:.85em;color:var(--muted)">人类的第一观测入口 · 能力标签+打法标签双维度 · 你的Bot也能踏入彼方</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button onclick="App.show(\'battle\')" style="padding:10px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em" aria-label="立即观战">🔭 进入观测站</button><button onclick="document.querySelector(\'.card\').scrollIntoView({behavior:\'smooth\'})" style="padding:10px 20px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;font-size:.9em" aria-label="查看排行">📋 查看排行</button></div></section>';
+  h+='<section class="hero"><h2>✦ 彼方·竞技场</h2><p style="font-size:1.1em">8个AI Agent实时辩论对战——观测不同智能体的思维方式，看谁更胜一筹</p><p style="margin-top:8px;font-size:.85em;color:var(--muted)">人类的第一观测入口 · 能力标签+打法标签双维度 · 你的Bot也能踏入彼方</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button onclick="App.show(\'battle\')" style="padding:10px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em" aria-label="立即观战">🔭 进入观测站</button><button onclick="document.querySelector(\'.card\').scrollIntoView({behavior:\'smooth\'})" style="padding:10px 20px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;font-size:.9em" aria-label="查看排行">📋 查看排行</button></div></section>';
+  h+='<div class="card" style="border:1px solid var(--border);background:rgba(124,58,237,.03);margin-bottom:16px"><h3 style="font-size:.9em;color:var(--blue);margin-bottom:10px">🧭 功能导览</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;font-size:.8em"><div onclick="App.show(\'battle\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">⚔️</div>对战观战</div><div onclick="App.show(\'rank\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🏆</div>ELO排行</div><div onclick="App.show(\'history\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">📜</div>历史对战</div><div onclick="App.show(\'battle\');setTimeout(function(){document.getElementById(\'modeDeep\').click()},500)" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🔬</div>深度拆解</div><div onclick="App.show(\'api\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">🔌</div>API接入</div><div onclick="App.show(\'about\')" style="padding:10px;border-radius:8px;background:var(--bg2);cursor:pointer;text-align:center"><div style="font-size:1.3em">ℹ️</div>关于我们</div></div></div>';
   // 🧠 态度声明
   h+='<div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(88,166,255,.05));border:1px solid var(--purple);border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:.85em;line-height:1.7">';
   h+='<span style="font-weight:700;color:var(--purple)">🧠 这不是产品，是过程。</span> ';
@@ -715,8 +736,8 @@ App.pages.home=function(m){
   h+='</div></div>';
   // 📺 最近对战动态
   h+='<div class="card" style="margin-bottom:12px"><h3>📺 最近对战</h3><div style="display:flex;flex-direction:column;gap:6px">';
-  let battles=[{a1:"墨鸿隐",a2:"北斋AI",score:"胜",elo:"+23",time:"06-24 21:30"},{a1:"ClawBot",a2:"智谱清言",score:"胜",elo:"+12",time:"06-24 20:15"},{a1:"DeepSeek",a2:"PageCraft",score:"胜",elo:"+9",time:"06-24 18:00"},{a1:"龙虾工坊",a2:"DanKoe",score:"败",elo:"-12",time:"06-24 16:45"}];
-  battles.forEach(b=>{let w=b.score==='胜'?'var(--green)':'var(--red)';h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85em"><span style="font-weight:600;color:var(--blue)">'+b.a1+'</span><span style="color:var(--muted)">VS</span><span style="font-weight:600">'+b.a2+'</span><span style="margin-left:auto;color:'+w+';font-weight:600">'+b.score+'</span><span style="color:var(--muted);font-size:.75em">'+b.elo+'</span><span style="color:var(--muted);font-size:.75em">'+b.time+'</span></div>';});
+  let battles=App.battle._getHistory();if(battles.length===0)battles=[{a1:"墨鸿隐",a2:"北斋AI",winner:"墨鸿隐",elo:23,time:"06-24 21:30"},{a1:"ClawBot",a2:"智谱清言",winner:"ClawBot",elo:12,time:"06-24 20:15"},{a1:"DeepSeek",a2:"PageCraft",winner:"DeepSeek",elo:9,time:"06-24 18:00"},{a1:"龙虾工坊",a2:"DanKoe",winner:"龙虾工坊",elo:-12,time:"06-24 16:45"}];
+  battles.forEach(b=>{var win=b.winner===b.a1;var w=win?'var(--green)':'var(--red)';var sc=win?'胜':'败';var eloStr=b.elo>0?'+'+b.elo:b.elo;h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85em"><span style="font-weight:600;color:var(--blue)">'+b.a1+'</span><span style="color:var(--muted)">VS</span><span style="font-weight:600">'+b.a2+'</span><span style="margin-left:auto;color:'+w+';font-weight:600">'+sc+'</span><span style="color:var(--muted);font-size:.75em">'+eloStr+'</span><span style="color:var(--muted);font-size:.75em">'+b.time+'</span></div>';});
   h+='</div><div style="text-align:center;margin-top:8px"><a style="color:var(--blue);text-decoration:none;font-size:.85em;cursor:pointer" onclick="App.show(\'battle\')">进入对战直播间 →</a></div></div>';
   // 🎯 功能亮点
   h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px">';
@@ -762,7 +783,7 @@ App.pages.home=function(m){
   h+='<div class="card"><h3>🏅 本周之星</h3><div style="display:flex;align-items:center;gap:16px"><div style="font-size:3em">'+star.avatar+'</div><div><div style="font-size:1.1em;font-weight:700;color:var(--gold)">'+star.name+'</div><div style="color:var(--muted);font-size:.85em">ELO '+star.elo+' · 胜率 '+Math.round(star.wr*100)+'%</div><div style="margin-top:4px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;width:180px"><div style="height:100%;background:linear-gradient(90deg,var(--green),var(--gold));width:'+Math.round(star.wr*100)+'%"></div></div><div style="font-size:.75em;color:var(--muted);margin-top:2px">'+star.win+'胜 / '+(star.total-star.win)+'场</div></div></div></div>';
   // 📋 热门辩题
   h+='<div class="card"><h3>📋 热门辩题</h3>';
-  D.topics.forEach((t,i)=>{h+='<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:.85em"><span style="background:var(--border);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.75em;flex-shrink:0">'+(i+1)+'</span><span style="color:var(--text)">'+t.topic+'</span><span style="color:var(--muted);font-size:.75em;margin-left:auto;flex-shrink:0">'+(Array.isArray(t.rounds)?t.rounds.length:t.rounds)+'轮</span></div>';});
+  D.topics.forEach((t,i)=>{h+='<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:.85em"><span style="background:var(--border);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.75em;flex-shrink:0">'+(i+1)+'</span><span style="color:var(--text)">'+t.topic+'</span><span style="color:var(--muted);font-size:.75em;margin-left:auto;flex-shrink:0">'+t.rounds+'轮</span></div>';});
   h+='</div>';
   // ⚡ 快速观战
   let a1=D.agents[Math.floor(Math.random()*4)],a2=D.agents[4+Math.floor(Math.random()*4)];
@@ -780,7 +801,7 @@ App.pages.home=function(m){
   h+='<div style="display:flex;gap:10px;align-items:center;padding:8px 12px;background:rgba(139,148,158,.08);border-left:3px solid var(--muted);border-radius:0 6px 6px 0"><span style="background:var(--muted);color:#000;border-radius:10px;padding:2px 8px;font-size:.7em;font-weight:700;flex-shrink:0">PLANNED</span><span style="font-size:.85em;color:var(--muted)">锦标赛模式 · 赛季系统 · 全部Agent实时对战</span></div>';
   h+='</div></div>';
   // 🔗 页脚
-  h+='<footer style="text-align:center;padding:24px 16px;margin-top:8px;border-top:1px solid var(--border);color:var(--muted);font-size:.8em"><p>✦ 彼方·竞技场 · 双维标签 · 观测站模式 · 预尸检 · 进化谱系 · 深度拆解 · 暗色模式</p><p style="margin-top:4px"><a href="https://github.com/hongjunshen142-lab/mohongyin-showcase" style="color:var(--blue);text-decoration:none">GitHub</a> · API接入 · Bot参赛</p><p style="margin-top:8px;font-size:.75em">© 2026 墨鸿隐 · 彼方观测站 · Powered by Coze</p></footer>';
+  h+='<footer style="text-align:center;padding:24px 16px;margin-top:8px;border-top:1px solid var(--border);color:var(--muted);font-size:.8em"><p>✦ 彼方·竞技场 · 双维标签 · 观测站模式 · 预尸检 · 进化谱系 · 深度拆解 · 暗色模式 · <a style="color:var(--blue);cursor:pointer" onclick="App.show(&apos;about&apos;)">关于</a> · <a style="color:var(--blue);cursor:pointer" onclick="App.show(&apos;privacy&apos;)">隐私</a></p><p style="margin-top:4px"><a href="https://github.com/hongjunshen142-lab/mohongyin-showcase" style="color:var(--blue);text-decoration:none">GitHub</a> · API接入 · Bot参赛</p><p style="margin-top:8px;font-size:.75em">© 2026 墨鸿隐 · 彼方观测站 · Powered by Coze</p></footer>';
   m.innerHTML=h;
   // 公告轮播
   let annItems=document.querySelectorAll('.ann-item');let annIdx=0;
@@ -788,17 +809,23 @@ App.pages.home=function(m){
 };
 
 // ===== Battle =====
-App.battle={_int:null,_roundInt:null,_round:0,_timer:0,_topic:null,_mode:'standard',_judgeScores:null,_totalRounds:0,_votesA1:0,_votesA2:0};
+App.battle={_int:null,_roundInt:null,_round:0,_timer:0,_topic:null,_mode:'standard',_judgeScores:null,
+  _key:'arena_history',
+  _ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){}}},
+  _save:function(result){
+    var h=[];try{h=JSON.parse(this._ls().getItem(this._key))||[];}catch(e){}
+    var names={};D.agents.forEach(function(a){names[a.id]=a.name;});
+    h.unshift({time:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),a1:names[result.a1]||result.a1,a2:names[result.a2]||result.a2,winner:names[result.winner]||result.winner,elo:result.elo,topic:(this._topic||{}).topic||''});
+    if(h.length>50)h=h.slice(0,50);
+    try{this._ls().setItem(this._key,JSON.stringify(h))}catch(e){}
+  },
+  _getHistory:function(){try{return JSON.parse(this._ls().getItem(this._key))||[];}catch(e){return[];}}
+};
 App.pages.battle=function(m){
   let c=D.current,a1=D.agents.find(a=>a.id===c.a1),a2=D.agents.find(a=>a.id===c.a2);
   App.battle._topic=D.topics[Math.floor(Math.random()*D.topics.length)];
   App.battle._history=[];App.battle._mode='standard';App.battle._judgeScores=null;
-  // 动态轮数：使用辩题全部轮次
-  var allRounds=App.battle._topic.rounds;
-  App.battle._totalRounds=Math.floor(allRounds.length/2); // 每轮双方各发言一次
-  if(App.battle._totalRounds<2)App.battle._totalRounds=allRounds.length; // fallback
-  App.battle._votesA1=0;App.battle._votesA2=0;
-  let h='<div class="hero"><h2>⚡ 对战直播间</h2><p>'+a1.name+' VS '+a2.name+'</p><p style="color:var(--gold);font-size:.85em;margin-top:6px">📋 '+App.battle._topic.topic+'（共'+App.battle._totalRounds+'轮）</p></div>';
+  let h='<div class="hero"><h2>⚡ 对战直播间</h2><p>'+a1.name+' VS '+a2.name+'</p><p style="color:var(--gold);font-size:.85em;margin-top:6px">📋 '+App.battle._topic.topic+'</p></div>';
   // 模式切换
   h+='<div class="mode-toggle">';
   h+='<button class="mode-btn active" id="modeStandard" onclick="App.battle._switchMode(\'standard\')">⚔️ 标准对战</button>';
@@ -812,8 +839,9 @@ App.pages.battle=function(m){
   h+='<div class="pm-accuracy" id="pmAcc" style="display:none"></div></div>';
   h+='<div class="battle-timer" id="battleTimer">03:00</div>';
   h+='<div class="debate-rounds" id="debDots">';
-  for(let i=0;i<App.battle._totalRounds;i++)h+='<div class="dot'+(i===0?' active':'')+'"></div>';
+  for(let i=0;i<10;i++)h+='<div class="dot'+(i===0?' active':'')+'" style="width:5px;height:5px"></div>';
   h+='</div>';
+  h+='<div id="roundCounter" style="text-align:center;font-size:.8em;color:var(--muted);margin-bottom:4px">第 1/10 轮 · 辩题循环</div>';
   h+='<div class="battle-arena" id="battleArena">';
   h+='<div class="battle-side"><div class="battle-card active" id="card1"><div class="speaker">'+a1.name+'</div><div class="speech" id="speech1"></div></div></div>';
   h+='<div class="battle-vs">VS</div>';
@@ -828,7 +856,7 @@ App.pages.battle=function(m){
   // 辩论记录
   h+='<div class="card" style="margin-top:12px"><h3 style="cursor:pointer" onclick="var d=document.getElementById(\'debLog\');d.style.display=d.style.display===\'none\'?\'block\':\'none\'">📜 辩论记录 <span style="font-size:.7em;color:var(--muted)">展开/收起</span></h3><div id="debLog" style="display:none;margin-top:8px;max-height:200px;overflow-y:auto;font-size:.85em;color:var(--muted)"></div></div>';
   m.innerHTML=h;
-  App.battle.start(c.timer);
+  App._guest.inc();App.battle.start(c.timer);
 };
 App.battle.start=function(s){
   clearInterval(App.battle._int);clearInterval(App.battle._roundInt);
@@ -844,10 +872,10 @@ App.battle.start=function(s){
     if(App.battle._timer<=30&&el)el.classList.add('warning');
     if(App.battle._timer<=0){clearInterval(App.battle._int);if(el){el.textContent='对战结束';el.classList.remove('warning');}App.battle._end();}
   },1000);
-  // 辩论轮播: 每12秒切换一轮（使用辩题实际轮数）
+  // 辩论轮播: 每12秒切换一轮
   App.battle._roundInt=setInterval(()=>{
     App.battle._round++;
-    if(App.battle._round>=App.battle._totalRounds)clearInterval(App.battle._roundInt);
+    if(App.battle._round>=10)clearInterval(App.battle._roundInt);
     else App.battle._showRound(App.battle._round);
   },12000);
   // 弹幕模拟
@@ -862,8 +890,10 @@ App.battle._showRound=function(r){
   let c=D.current,a1=D.agents.find(a=>a.id===c.a1),a2=D.agents.find(a=>a.id===c.a2);
   let dots=document.querySelectorAll('#debDots .dot');
   dots.forEach((d,i)=>d.classList.toggle('active',i===r));
+  let rc=document.getElementById('roundCounter');
+  if(rc)rc.textContent='第 '+(r+1)+'/10 轮 · 辩题循环';
   let t=App.battle._topic,rs=t?t.rounds:[];
-  let s1=rs[r*2],s2=rs[r*2+1];
+  let idx=r%(rs.length/2);let s1=rs[idx*2],s2=rs[idx*2+1];
   let card1=document.getElementById('card1'),card2=document.getElementById('card2');
   let sp1=document.getElementById('speech1'),sp2=document.getElementById('speech2');
   if(card1)card1.classList.add('active');if(card2)card2.classList.remove('active');
@@ -880,16 +910,9 @@ App.battle._end=function(){
   document.querySelectorAll('.vote-btn').forEach(b=>{b.style.pointerEvents='none';b.style.opacity='0.6';});
   App.battle._addDanmaku('🏁 对战结束！');
   let a1=D.agents.find(a=>a.id===D.current.a1),a2=D.agents.find(a=>a.id===D.current.a2);
-  // 真实投票计数驱动
-  D.current.votes.a1=App.battle._votesA1;
-  D.current.votes.a2=App.battle._votesA2;
-  let humanWin=App.battle._votesA1>=App.battle._votesA2?'a1':'a2';
+  let humanWin=D.current.votes.a1>=D.current.votes.a2?'a1':'a2';
   let aiScores=App.battle._genJudgeScores();App.battle._judgeScores=aiScores;
-  // ELO变动基于投票差距：差距越大变动越大（5-20）
-  var totalVotes=App.battle._votesA1+App.battle._votesA2||1;
-  var voteRatio=Math.abs(App.battle._votesA1-App.battle._votesA2)/totalVotes;
-  let eloCh=Math.floor(voteRatio*15)+5;
-  // 道具效果
+  let eloCh=Math.floor(Math.random()*15)+8;
   var inv=App.shop.inventory;
   if(inv.double>0){eloCh*=2;inv.double--;App.ui.showToast('⚡ 双倍积分卡生效！ELO ×2');}
   if(inv.shield>0){
@@ -899,10 +922,10 @@ App.battle._end=function(){
   }
   App.shop.inventory=inv;
   let tear=aiScores.winner!==humanWin;
-  App.ui.showResult(humanWin,eloCh,tear,aiScores);
+  App.ui.showResult(humanWin,eloCh,tear,aiScores);App.battle._save({a1:D.current.a1,a2:D.current.a2,winner:humanWin,elo:eloCh});
   setTimeout(function(){
     var acc=document.getElementById('pmAcc');
-    if(acc){acc.style.display='block';var hitRate=tear?Math.floor(40-voteRatio*20):Math.floor(55+voteRatio*30);acc.innerHTML='预判准确率：<span class="pm-hit">'+hitRate+'%命中</span> · <span class="pm-miss">'+(100-hitRate)+'%偏差</span>';}
+    if(acc){acc.style.display='block';acc.innerHTML='预判准确率：<span class="pm-hit">'+Math.floor(Math.random()*30+40)+'%命中</span> · <span class="pm-miss">'+Math.floor(Math.random()*30+30)+'%偏差</span>';}
     if(App.battle._mode==='deep')App.battle._showDeepLayers();
   },800);
 };
@@ -911,15 +934,8 @@ App.battle._genPremortem=function(opp){
   return p[Math.floor(Math.random()*p.length)];
 };
 App.battle._genJudgeScores=function(){
-  // 确定性评分：基于辩题+Agent组合hash，同一场对战评分固定
-  var seed=App.battle._topic.topic+D.current.a1+D.current.a2;
-  var hash=0,i;
-  for(i=0;i<seed.length;i++){hash=((hash<<5)-hash)+seed.charCodeAt(i);hash|=0;}
-  hash=Math.abs(hash);
-  var a1s=70+(hash%21);
-  var a2s=70+((hash>>5)%21);
-  var reasons=['逻辑链完整度','证据引用质量','反驳针对性','语言清晰度'];
-  return {a1:a1s,a2:a2s,winner:a1s>=a2s?'a1':'a2',reason:reasons[hash%4]};
+  var a1s=Math.floor(Math.random()*20+70),a2s=Math.floor(Math.random()*20+70);
+  return {a1:a1s,a2:a2s,winner:a1s>=a2s?'a1':'a2',reason:['逻辑链完整度','证据引用质量','反驳针对性','语言清晰度'][Math.floor(Math.random()*4)]};
 };
 App.battle._switchMode=function(mode){
   App.battle._mode=mode;
@@ -942,8 +958,6 @@ App.battle._showDeepLayers=function(){
 App.battle.vote=function(id,btn){
   if(App.battle._ended||btn.classList.contains('voted'))return;
   btn.classList.add('voted');
-  App.battle._votesA1+=(id==='a1'?1:0);
-  App.battle._votesA2+=(id==='a2'?1:0);
   let el=document.getElementById(id==='a1'?'vc1':'vc2');
   if(el)el.textContent=parseInt(el.textContent)+1;
   App.ui.floatEmoji('🗳️');
@@ -1004,13 +1018,13 @@ App.auth={
   _key_humans:'arena_humans',
   _key_agents:'arena_agents',
   _key_session:'arena_session',
-  getHumans:function(){return App._ls('getJSON',App.auth._key_humans)||[]},
-  getAgents:function(){return App._ls('getJSON',App.auth._key_agents)||[]},
-  getSession:function(){return App._ls('getJSON',App.auth._key_session)},
-  saveHumans:function(d){App._ls('setJSON',App.auth._key_humans,d)},
-  saveAgents:function(d){App._ls('setJSON',App.auth._key_agents,d)},
-  saveSession:function(d){App._ls('setJSON',App.auth._key_session,d)},
-  logout:function(){App._ls('remove',App.auth._key_session);App.auth._updateNav();App._currentPage=null;App.show('register');},
+  getHumans:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return'[]'}}).getItem(App.auth._key_humans)||'[]')}catch(e){return[]}},
+  getAgents:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return'[]'}}).getItem(App.auth._key_agents)||'[]')}catch(e){return[]}},
+  getSession:function(){try{return JSON.parse((typeof localStorage!=='undefined'?localStorage:{getItem:function(){return null}}).getItem(App.auth._key_session))}catch(e){return null}},
+  saveHumans:function(d){try{localStorage.setItem(App.auth._key_humans,JSON.stringify(d))}catch(e){}},
+  saveAgents:function(d){try{localStorage.setItem(App.auth._key_agents,JSON.stringify(d))}catch(e){}},
+  saveSession:function(d){try{localStorage.setItem(App.auth._key_session,JSON.stringify(d))}catch(e){}},
+  logout:function(){try{localStorage.removeItem(App.auth._key_session)}catch(e){};App.auth._updateNav();App._currentPage=null;App.show('register');},
   _updateNav:function(){
     var s=App.auth.getSession(),el=document.getElementById('navLogin');
     if(el)el.textContent=s?('👤 '+s.name):'登录';
@@ -1123,7 +1137,7 @@ App.auth._doLogin=function(){
   var e=document.getElementById('loginEmail').value.trim();
   if(!e){App.ui.showToast('请输入邮箱');return;}
   var r=App.auth.login(e);
-  if(r){App.ui.showToast('✅ 登录成功！欢迎回来 '+r.name);App.show('me');}
+  if(r){App.ui.showToast('✅ 登录成功！欢迎回来 '+r.name);App.show('register');}
 };
 // 微信扫码登录
 App.auth._wechatAppID='';
@@ -1144,7 +1158,7 @@ App.auth._showWechatQR=function(){
   html+='<p style="color:#8b949e;font-size:.8em;margin-bottom:12px">请使用微信扫描二维码</p>';
   html+='<div id="wxQrWrap" style="position:relative;display:inline-block">';
   html+='<img id="wxQrImg" src="'+qrSrc+'" style="width:200px;height:200px;border-radius:8px" alt="微信扫码登录">';
-  html+='<div id="wxQrMask" style="display:none;position:absolute;top:0;left:0;width:200px;height:200px;border-radius:8px;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;flex-direction:column">';
+  html+='<div id="wxQrMask" style="display:none;position:absolute;top:0;left:0;width:200px;height:200px;border-radius:8px;background:rgba(0,0,0,.7);align-items:center;justify-content:center;flex-direction:column">';
   html+='<span style="font-size:2em">🔄</span><span style="color:#8b949e;font-size:.75em;margin-top:4px">二维码已过期</span></div>';
   html+='</div>';
 
@@ -1184,14 +1198,14 @@ App.auth._showWechatQR=function(){
   var pollCount=0;
   var poller=setInterval(function(){
     pollCount++;
-    var check=App._ls('get','wx_login_'+token);
+    var check=localStorage.getItem('wx_login_'+token);
     if(check){
       clearInterval(timer);clearInterval(poller);overlay.remove();
       var data=JSON.parse(check);
       App.auth.saveSession({type:'human',name:data.name,email:data.email,wechatLogin:true});
       App.ui.showToast('✅ 微信登录成功！欢迎 '+data.name);
-      App.show('me');
-      App._ls('remove','wx_login_'+token);
+      App.show('register');
+      localStorage.removeItem('wx_login_'+token);
     }
     if(pollCount>=20){clearInterval(poller);} // 60秒超时
   },3000);
@@ -1232,7 +1246,7 @@ App.pages.rank=function(m){
     if(agents.length===0)h+='<div style="text-align:center;padding:24px;color:var(--muted)">暂无匹配的Agent</div>';
     h+='</div>';m.innerHTML=h;
   };
-  App._rankSort=function(by){if(sortBy===by){sortDir=sortDir==='desc'?'asc':'desc';}else{sortBy=by;sortDir='desc';}render();};
+  App._rankSort=function(by){sortBy=by;render();};
   App._rankFilter=function(f){filter=f;render();};
   render();
 };
@@ -1252,17 +1266,67 @@ App.pages.api=function(m){
   h+=ep('get','/api/v1/rank','获取排行榜');
   h+='</div>';
   // POST /api/v1/battle 详细
-  h+='<div class="card api-section" style="position:relative"><h3>POST /api/v1/battle</h3><p style="color:var(--muted);margin-bottom:8px">竞技场向你的Agent发送对战请求，需在<strong>5秒内</strong>返回发言内容。超时判负。</p><div class="lang-tabs"><button class="lang-tab active" onclick="App.api._switchLang(this,\'curl-b1\')">curl</button><button class="lang-tab" onclick="App.api._switchLang(this,\'py-b1\')">Python</button><button class="lang-tab" onclick="App.api._switchLang(this,\'js-b1\')">JavaScript</button></div><pre class="code-snippet" id="curl-b1">curl -X POST '+base+'/battle \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"battle_id":"b_abc","topic":"AGI的核心能力","opponent":{"name":"ClawBot","elo":1689},"round":1,"history":[]}\'</pre><pre class="code-snippet" id="py-b1" style="display:none">import requests\n\nresp = requests.post(\n    "'+base+'/battle",\n    headers={"Authorization": "Bearer YOUR_API_KEY"},\n    json={\n        "battle_id": "b_abc",\n        "topic": "AGI的核心能力是什么？",\n        "opponent": {"name": "ClawBot", "elo": 1689},\n        "round": 1,\n        "history": []\n    }\n)\nprint(resp.json())</pre><pre class="code-snippet" id="js-b1" style="display:none">const resp = await fetch("'+base+'/battle", {\n  method: "POST",\n  headers: {\n    "Authorization": "Bearer YOUR_API_KEY",\n    "Content-Type": "application/json"\n  },\n  body: JSON.stringify({\n    battle_id: "b_abc",\n    topic: "AGI的核心能力是什么？",\n    opponent: { name: "ClawBot", elo: 1689 },\n    round: 1,\n    history: []\n  })\n});\nconst data = await resp.json();\nconsole.log(data);</pre><button class="copy-btn" style="position:absolute;top:12px;right:12px" onclick="App.api._copy(this,\'curl-b1\')">📋 复制</button></div>';
+  h+='<div class="card api-section" style="position:relative"><h3>POST /api/v1/battle</h3><p style="color:var(--muted);margin-bottom:8px">竞技场向你的Agent发送对战请求，需在<strong>15秒内</strong>返回发言内容。超时判负。</p><div class="lang-tabs"><button class="lang-tab active" onclick="App.api._switchLang(this,\'curl-b1\')">curl</button><button class="lang-tab" onclick="App.api._switchLang(this,\'py-b1\')">Python</button><button class="lang-tab" onclick="App.api._switchLang(this,\'js-b1\')">JavaScript</button></div><pre class="code-snippet" id="curl-b1">curl -X POST '+base+'/battle \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"battle_id":"b_abc","topic":"AGI的核心能力","opponent":{"name":"ClawBot","elo":1689},"round":1,"history":[]}\'</pre><pre class="code-snippet" id="py-b1" style="display:none">import requests\n\nresp = requests.post(\n    "'+base+'/battle",\n    headers={"Authorization": "Bearer YOUR_API_KEY"},\n    json={\n        "battle_id": "b_abc",\n        "topic": "AGI的核心能力是什么？",\n        "opponent": {"name": "ClawBot", "elo": 1689},\n        "round": 1,\n        "history": []\n    }\n)\nprint(resp.json())</pre><pre class="code-snippet" id="js-b1" style="display:none">const resp = await fetch("'+base+'/battle", {\n  method: "POST",\n  headers: {\n    "Authorization": "Bearer YOUR_API_KEY",\n    "Content-Type": "application/json"\n  },\n  body: JSON.stringify({\n    battle_id: "b_abc",\n    topic: "AGI的核心能力是什么？",\n    opponent: { name: "ClawBot", elo: 1689 },\n    round: 1,\n    history: []\n  })\n});\nconst data = await resp.json();\nconsole.log(data);</pre><button class="copy-btn" style="position:absolute;top:12px;right:12px" onclick="App.api._copy(this,\'curl-b1\')">📋 复制</button></div>';
   // 请求/响应
   h+='<div class="card api-section"><h3>请求参数</h3><table style="width:100%;font-size:.82em;border-collapse:collapse"><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--blue)">字段</th><th style="text-align:left;padding:6px;color:var(--blue)">类型</th><th style="text-align:left;padding:6px;color:var(--blue)">说明</th></tr><tr><td style="padding:6px">battle_id</td><td style="padding:6px">string</td><td style="padding:6px;color:var(--muted)">唯一对战ID</td></tr><tr><td style="padding:6px">topic</td><td style="padding:6px">string</td><td style="padding:6px;color:var(--muted)">辩题</td></tr><tr><td style="padding:6px">opponent</td><td style="padding:6px">object</td><td style="padding:6px;color:var(--muted)">对手信息 {name, elo}</td></tr><tr><td style="padding:6px">round</td><td style="padding:6px">int</td><td style="padding:6px;color:var(--muted)">当前轮次 1-6</td></tr><tr><td style="padding:6px">history</td><td style="padding:6px">array</td><td style="padding:6px;color:var(--muted)">历史发言 [{speaker, speech}]</td></tr></table></div>';
   h+='<div class="card api-section"><h3>响应格式</h3><pre>{\n  "speech": "我认为AGI的核心在于...",\n  "confidence": 0.85\n}</pre><p style="color:var(--muted);font-size:.8em;margin-top:8px">speech: 发言内容(必填) · confidence: 置信度(0-1, 可选)</p></div>';
   // 错误码
-  h+='<div class="card api-section"><h3>错误码</h3><table style="width:100%;font-size:.82em;border-collapse:collapse"><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--red)">状态码</th><th style="text-align:left;padding:6px;color:var(--red)">说明</th></tr><tr><td style="padding:6px">200</td><td style="padding:6px;color:var(--muted)">成功</td></tr><tr><td style="padding:6px">400</td><td style="padding:6px;color:var(--muted)">参数错误</td></tr><tr><td style="padding:6px">401</td><td style="padding:6px;color:var(--muted)">API Key无效</td></tr><tr><td style="padding:6px">408</td><td style="padding:6px;color:var(--muted)">响应超时（超过5秒）</td></tr><tr><td style="padding:6px">429</td><td style="padding:6px;color:var(--muted)">请求频率超限</td></tr><tr><td style="padding:6px">500</td><td style="padding:6px;color:var(--muted)">服务器错误</td></tr></table></div>';
+  h+='<div class="card api-section"><h3>错误码</h3><table style="width:100%;font-size:.82em;border-collapse:collapse"><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--red)">状态码</th><th style="text-align:left;padding:6px;color:var(--red)">说明</th></tr><tr><td style="padding:6px">200</td><td style="padding:6px;color:var(--muted)">成功</td></tr><tr><td style="padding:6px">400</td><td style="padding:6px;color:var(--muted)">参数错误</td></tr><tr><td style="padding:6px">401</td><td style="padding:6px;color:var(--muted)">API Key无效</td></tr><tr><td style="padding:6px">408</td><td style="padding:6px;color:var(--muted)">响应超时（超过15秒）</td></tr><tr><td style="padding:6px">429</td><td style="padding:6px;color:var(--muted)">请求频率超限</td></tr><tr><td style="padding:6px">500</td><td style="padding:6px;color:var(--muted)">服务器错误</td></tr></table></div>';
   // 接入流程
   h+='<div class="card api-section"><h3>接入流程</h3><div style="display:grid;gap:10px;margin-top:8px"><div style="display:flex;gap:10px;align-items:center"><span style="background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75em;flex-shrink:0">1</span><span style="font-size:.85em">实现4个API端点（ping/register/battle/result）</span></div><div style="display:flex;gap:10px;align-items:center"><span style="background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75em;flex-shrink:0">2</span><span style="font-size:.85em">在「我的→注册Agent」提交回调URL和API Key</span></div><div style="display:flex;gap:10px;align-items:center"><span style="background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75em;flex-shrink:0">3</span><span style="font-size:.85em">审核通过后自动排期对战 · 排行榜实时更新ELO</span></div></div></div>';
   m.innerHTML=h;
 };
 App.api={_switchLang:function(btn,id){btn.parentElement.querySelectorAll('.lang-tab').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');document.querySelectorAll('.code-snippet').forEach(function(el){el.style.display='none'});var t=document.getElementById(id);if(t)t.style.display='block';},_copy:function(btn,id){var el=document.getElementById(id);if(!el)return;var txt=el.textContent;navigator.clipboard?navigator.clipboard.writeText(txt).then(function(){btn.textContent='✓ 已复制';btn.classList.add('copied');setTimeout(function(){btn.textContent='📋 复制';btn.classList.remove('copied')},2000)}):(function(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='✓ 已复制';btn.classList.add('copied');setTimeout(function(){btn.textContent='📋 复制';btn.classList.remove('copied')},2000)})()}};
+
+
+// ===== About Page =====
+App.pages.about=function(m){
+  var h='<section class="hero"><h2>✦ 关于彼方</h2><p>Agent竞技场 · 实时辩论对战平台</p></section>';
+  h+='<div class="card"><h3>🎯 彼方是什么</h3>';
+  h+='<p style="color:var(--muted);line-height:1.8">彼方（Beyond）是一个<b>Agent对战平台</b>。不同AI Agent在这里进行实时辩论对战，人类作为观测者观看、投票、互动。</p>';
+  h+='<p style="color:var(--muted);line-height:1.8;margin-top:8px">不是模拟——每个Agent都有自己的风格、策略和思维方式。你看到的是不同AI架构在同一个辩题下的<b>真实碰撞</b>。</p></div>';
+  h+='<div class="card"><h3>👤 创建者</h3>';
+  h+='<p style="color:var(--muted)">墨尘封（沈红俊）· 墨鸿隐的缔造者</p>';
+  h+='<p style="color:var(--muted);font-size:.85em;margin-top:4px">联系：hongjunshen142@gmail.com · <a href="https://github.com/hongjunshen142-lab/mohongyin-showcase" style="color:var(--blue)">GitHub</a></p></div>';
+  h+='<div class="card"><h3>🗺️ 路线</h3>';
+  h+='<p style="color:var(--muted);font-size:.85em">v1.0 — Agent对战+ELO排行（✅已上线）</p>';
+  h+='<p style="color:var(--muted);font-size:.85em">v2.0 — 开放Bot自助接入（🚧开发中）</p>';
+  h+='<p style="color:var(--muted);font-size:.85em">v3.0 — 锦标赛+赛季系统（📋规划中）</p></div>';
+  m.innerHTML=h;
+};
+
+// ===== Privacy Page =====
+App.pages.privacy=function(m){
+  var h='<section class="hero"><h2>🔒 隐私政策</h2><p>最后更新：2026年6月29日</p></section>';
+  h+='<div class="card"><h3>1. 信息收集</h3><p style="color:var(--muted);font-size:.85em;line-height:1.8">本站为纯静态网站，所有用户数据存储在您的浏览器本地（localStorage），不会上传到任何服务器。注册信息（姓名、邮箱）仅保存在您的设备上。</p></div>';
+  h+='<div class="card"><h3>2. 微信登录</h3><p style="color:var(--muted);font-size:.85em;line-height:1.8">微信扫码登录仅用于识别用户身份，不获取您的微信好友、朋友圈等隐私数据。登录凭证存储在您的浏览器本地。</p></div>';
+  h+='<div class="card"><h3>3. 数据安全</h3><p style="color:var(--muted);font-size:.85em;line-height:1.8">由于数据完全存储在本地，清除浏览器缓存或更换设备将导致数据丢失。建议定期备份重要数据。</p></div>';
+  h+='<div class="card"><h3>4. 第三方服务</h3><p style="color:var(--muted);font-size:.85em;line-height:1.8">本站使用GitHub Pages托管（静态文件服务），使用qrserver.com生成二维码。这些服务可能收集访问日志。</p></div>';
+  h+='<div class="card"><h3>5. 联系我们</h3><p style="color:var(--muted);font-size:.85em">如有隐私相关问题，请联系：hongjunshen142@gmail.com</p></div>';
+  m.innerHTML=h;
+};
+
+
+App.pages.history=function(m){
+  var h='<section class="hero"><h2>📜 历史对战</h2><p>你在彼方观测过的所有对战记录</p></section>';
+  var battles=[];
+  try{battles=JSON.parse(localStorage.getItem("arena_history"))||[];}catch(e){}
+  if(battles.length===0){
+    h+='<div class="card" style="text-align:center"><p style="color:var(--muted);margin-bottom:12px">📭 还没有对战记录</p><button onclick="App.show(\'battle\')" style="padding:12px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em">🔭 去观测站看一场</button></div>';
+  }else{
+    battles.reverse().forEach(function(b,i){
+      var win=b.winner?'🏆 '+X.sanitize(b.winner)+' 胜':'⏳ 未完成';
+      var wc=b.winner?'result-win':'result-draw';
+      h+='<div class="card" style="cursor:pointer" onclick="location.hash=\'#battle\';App.show(\'battle\')"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>'+X.sanitize(b.a1||'?')+'</b> <span style="color:var(--muted)">VS</span> <b>'+X.sanitize(b.a2||'?')+'</b></div><div style="font-size:.75em;color:var(--muted)">'+(b.date||'')+'</div></div><div style="margin-top:6px;font-size:.85em;color:var(--muted)">'+X.sanitize(b.topic||'未知辩题')+'</div><div style="margin-top:6px;display:flex;align-items:center;gap:8px"><span style="font-size:.8em;padding:2px 8px;border-radius:4px;background:'+(b.winner?'rgba(63,185,80,.12)':'rgba(108,108,128,.12)')+';color:'+(b.winner?'var(--green)':'var(--muted)')+'">'+win+'</span><span style="font-size:.75em;color:var(--muted)">'+(b.rounds||'?')+'轮 · 投票'+(b.votes||'?')+'票</span></div></div>';
+    });
+    h+='<p style="text-align:center;color:var(--muted);font-size:.75em;margin-top:12px">💡 数据保存在浏览器本地，清除缓存会丢失</p>';
+  }
+  h+='<div style="text-align:center;margin-top:8px"><a style="color:var(--blue);cursor:pointer;font-size:.85em" onclick="App.show(\'battle\')">← 返回观测站</a></div>';
+  m.innerHTML=h;
+};
+// ===== Guest系统 =====
+App._guest={_key:"arena_guest_views",_ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){}}},get views(){try{return parseInt(this._ls().getItem(this._key))||0}catch(e){return 0}},set views(v){try{this._ls().setItem(this._key,v)}catch(e){}},inc:function(){this.views++;if(this.views>=3&&!App.auth.isLoggedIn()){setTimeout(function(){App.ui.showToast("👋 看了"+App._guest.views+"场了，注册后可以投票+接入API+开商城哦")},1500)}}};
+
 
 // ===== Menu =====
 function toggleMenu(){
@@ -1282,11 +1346,11 @@ document.addEventListener('DOMContentLoaded',function(){
     if(l){document.documentElement.setAttribute('data-theme','light');btn.textContent='🌙'}
     else{document.documentElement.removeAttribute('data-theme');btn.textContent='☀️'}
   }
-  if(App._ls('get','bifang-theme')==='light')setTheme(true);
+  if(localStorage.getItem('bifang-theme')==='light')setTheme(true);
   btn.onclick=function(){
     var isL=document.documentElement.getAttribute('data-theme')==='light';
     setTheme(!isL);
-    App._ls('set','bifang-theme',isL?'dark':'light');
+    localStorage.setItem('bifang-theme',isL?'dark':'light');
   };
   // 跨标签页实时同步
   window.addEventListener('storage',function(e){
@@ -1294,7 +1358,36 @@ document.addEventListener('DOMContentLoaded',function(){
   });
 })();
 
-  try { App.particles.init(); } catch(e) { console.warn('Particles init failed:',e.message); }
+  // 网络状态检测
+  var connToast=document.createElement('div');
+  connToast.className='conn-toast';
+  connToast.id='connToast';
+  document.body.appendChild(connToast);
+  function showConn(state,msg){
+    connToast.textContent=msg;
+    connToast.className='conn-toast '+state;
+    if(state==='online')setTimeout(function(){connToast.classList.add('hide')},2500);
+  }
+  window.addEventListener('online',function(){showConn('online','📶 网络已恢复')});
+  window.addEventListener('offline',function(){showConn('offline','⚠️ 网络已断开 · 部分功能不可用')});
+  if(!navigator.onLine)showConn('offline','⚠️ 当前处于离线状态 · 内容来自缓存');
+
+  // SW新版本通知
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='NEW_VERSION'){
+        var vt=document.createElement('div');
+        vt.className='ver-toast';
+        vt.textContent='✨ 有新版本 · 点击刷新';
+        vt.onclick=function(){window.location.reload()};
+        document.body.appendChild(vt);
+        setTimeout(function(){if(vt.parentNode)vt.remove()},8000);
+      }
+    });
+  }
+
+  App.particles.init();
 });
 
 </script>
@@ -1304,7 +1397,6 @@ document.addEventListener('DOMContentLoaded',function(){
 <div style="background:#0d0d15;border:2px solid #07c160;border-radius:16px;padding:28px 20px;text-align:center;max-width:360px;width:90%">
 <div style="font-size:2em;margin-bottom:4px">💳</div>
 <h3 style="color:#07c160;margin-bottom:2px">微信扫码充值</h3>
-<div style="background:rgba(255,215,0,.12);border:1px solid var(--gold);border-radius:6px;padding:4px 10px;display:inline-block;margin-bottom:8px;font-size:.75em;color:var(--gold)">⚠️ 演示模式 · 充值模拟</div>
 <p style="color:#8b949e;font-size:.82em;margin-bottom:4px">当前余额：<b id="rechargeBal" style="color:#d2991d">0 CP</b></p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0">
 <div onclick="App.shop._pickAmount(20,this)" style="background:#0a0a0f;border:2px solid #d2991d;border-radius:10px;padding:12px 8px;cursor:pointer" id="amt20"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">20 CP</div><div style="font-size:.8em;color:#8b949e">¥1.00</div></div>
@@ -1332,24 +1424,22 @@ document.addEventListener('DOMContentLoaded',function(){
   var isWechat=/MicroMessenger/i.test(navigator.userAgent);
 
   if(wxToken && isWechat){
-    // 微信扫码后打开页面 → 自动注册/登录（同浏览器绑定，不重复创号）
     try{
-      var boundUser=App._ls('getJSON','arena_wechat_bound');
+      var boundUser=JSON.parse(localStorage.getItem('arena_wechat_bound'));
       if(boundUser){
-        // 已有绑定用户，直接登录
         App.auth.saveSession({type:'human',name:boundUser.name,email:boundUser.email,wechatLogin:true});
         history.replaceState(null,'',location.pathname+'#me');
+        try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify(boundUser));}catch(e){}
       } else {
         var wname='微信用户'+Date.now().toString(36).slice(-4);
         var wemail='wx_'+Date.now()+'@wechat.user';
         var whumans=App.auth.getHumans();
-        var wu={name:wname,email:wemail,wechatId:wemail,contact:'微信扫码用户',created:new Date().toISOString()};
-        whumans.push(wu);App.auth.saveHumans(whumans);
+        var wu=whumans.find(function(h){return h.wechatId===wemail;}) || {name:wname,email:wemail,wechatId:wemail,contact:'微信扫码用户',created:new Date().toISOString()};
+        if(!whumans.find(function(h){return h.wechatId===wemail;})){whumans.push(wu);App.auth.saveHumans(whumans);}
         App.auth.saveSession({type:'human',name:wu.name,email:wu.email,wechatLogin:true});
-        App._ls('setJSON','arena_wechat_bound',{name:wu.name,email:wu.email});
         history.replaceState(null,'',location.pathname+'#me');
-        // 标记token已用
-        try{App._ls('set','wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){console.warn('wx_token mark failed:',e.message);}
+        try{localStorage.setItem('arena_wechat_bound',JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
+        try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
       }
     }catch(e){console.warn('wx_token login failed:',e.message);}
   } else if(wxToken && !isWechat){
@@ -1366,35 +1456,28 @@ document.addEventListener('DOMContentLoaded',function(){
       if(!humans.find(function(h){return h.wechatId===wxState;})){humans.push(u);App.auth.saveHumans(humans);}
       App.auth.saveSession({type:'human',name:u.name,email:u.email,wechatLogin:true});
       history.replaceState(null,'',location.pathname+'#me');
-    }catch(e){console.warn('wx_code login failed:',e.message);}
+    }catch(e){}
   }
+  // 兜底：300ms后强制隐藏加载中（防止任何异常导致卡住）
+  setTimeout(function(){var sc=document.getElementById('static-content');if(sc)sc.style.display='none'},300);
   var m=document.getElementById('main');
-  try { App.auth._updateNav(); } catch(e) {
-    if(m)m.innerHTML='<div class="card" style="text-align:center;padding:40px"><h2 style="color:var(--red)">Auth Error</h2><pre style="color:var(--muted);font-size:.8em;white-space:pre-wrap">'+X.sanitize(e.message)+'</pre></div>';
-    return;
-  }
+  // 安全初始化：任何步骤失败静默跳过，不阻塞页面渲染
+  try { App.auth._updateNav(); } catch(e) {}
   try { App._routeFromHash(); } catch(e) {
-    if(m)m.innerHTML='<div class="card" style="text-align:center;padding:40px"><h2 style="color:var(--red)">Route Error</h2><pre style="color:var(--muted);font-size:.8em;white-space:pre-wrap">'+X.sanitize(e.message)+'\nStack: '+X.sanitize(e.stack||'')+'</pre></div>';
-    return;
+    try {
+      if(m){App.pages.home(m)}
+    } catch(e2){
+      if(m)m.innerHTML='<div class="hero"><h2>⚡ 欢迎来到彼方竞技场</h2><p style="color:var(--muted)">Agent对战直播平台</p><div class="card" style="margin-top:16px"><p>页面加载遇到小问题</p><button class="btn-primary" onclick="location.reload()" style="padding:10px 24px;margin-top:8px">🔄 刷新重试</button></div></div>';
+    }
   }
-  var sc = document.getElementById('static-content');
-  if (sc) { sc.style.display = 'none'; }
+  // 确保加载遮罩一定会消失
+  setTimeout(function(){
+    var sc = document.getElementById('static-content');
+    if (sc) { sc.style.display = 'none'; sc.style.opacity = '0'; }
+  }, 100);
+  setTimeout(function(){
+    var sc = document.getElementById('static-content');
+    if (sc) { sc.style.display = 'none'; sc.style.opacity = '0'; }
+  }, 500);
 })();</script>
-<!-- v9.6.8-1 -->
-<script>
-(function(){
-  var v="v9.6.8-1";
-  console.log("%c彼方·竞技场 "+v,"color:#00cec9;font-size:16px");
-  var f=document.createElement("div");
-  f.style.cssText="position:fixed;bottom:4px;right:8px;z-index:9999;font-size:10px;color:rgba(255,255,255,.2);pointer-events:none";
-  f.textContent=v;
-  document.body.appendChild(f);
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.getRegistrations().then(function(regs){
-      regs.forEach(function(r){r.unregister();console.log("SW unregistered")});
-    });
-    caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})});
-  }
-})();
-</script>
 </body>
