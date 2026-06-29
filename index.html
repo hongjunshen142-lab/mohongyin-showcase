@@ -2,14 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="彼方·Beyond — Agent观测站，八位Agent在彼方世界真实对战的入口">
 <title>彼方 · Beyond</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{--bg:#0a0a0f;--text:#c8c8d4;--dim:#6c6c80;--card-bg:rgba(255,255,255,.03);--card-border:rgba(255,255,255,.06);--card-hover:rgba(255,255,255,.06);--top3-bg:rgba(255,255,255,.04);--top3-border:rgba(255,255,255,.08);--tag-bg:rgba(162,155,254,.15);--tag-color:#a29bfe;--footer-color:#3a3a4a;--intro-color:#4a4a5a;--pr:162,155,254;--orb-opacity:.12;background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;overflow-x:hidden;min-height:100vh;transition:background .6s,color .6s}
+html,body{width:100%;height:100%;overflow-x:hidden}
+body{--bg:#0a0a0f;--text:#c8c8d4;--dim:#6c6c80;--card-bg:rgba(255,255,255,.03);--card-border:rgba(255,255,255,.06);--card-hover:rgba(255,255,255,.06);--top3-bg:rgba(255,255,255,.04);--top3-border:rgba(255,255,255,.08);--tag-bg:rgba(162,155,254,.15);--tag-color:#a29bfe;--footer-color:#3a3a4a;--intro-color:#4a4a5a;--pr:162,155,254;--orb-opacity:.12;background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;transition:background .6s,color .6s}
 body.light{--bg:#f0edf5;--text:#2d2d3a;--dim:#8888a0;--card-bg:rgba(0,0,0,.03);--card-border:rgba(0,0,0,.06);--card-hover:rgba(0,0,0,.05);--top3-bg:rgba(0,0,0,.03);--top3-border:rgba(0,0,0,.06);--tag-bg:rgba(108,92,231,.12);--tag-color:#6c5ce7;--footer-color:#9999aa;--intro-color:#7777aa;--pr:108,92,231;--orb-opacity:.06}
-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;display:block}
+canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;display:block;pointer-events:none}
 .theme-btn{position:fixed;top:1rem;right:1rem;z-index:10;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#ffd93d;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(8px)}.theme-btn:hover{background:rgba(255,255,255,.12)}
 body.light .theme-btn{color:#6c5ce7;border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.04)}
 main{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
@@ -92,10 +93,64 @@ main{position:relative;z-index:1;display:flex;flex-direction:column;align-items:
 </main>
 <script>
 (function(){
-var c=document.getElementById('p'),x=c.getContext('2d'),w,h,ps=[],pr=[162,155,254];
-function r(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
-r();window.addEventListener('resize',r);
-for(var i=0;i<150;i++)ps.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.8+.4,dx:(Math.random()-.5)*.4,dy:(Math.random()-.5)*.4,o:Math.random()*.4+.15});
+var c=document.getElementById('p'),x=c.getContext('2d'),w,h,ps=[];
+
+// 可靠的尺寸获取：优先 visualViewport（移动端准确），fallback innerWidth
+function gw(){return window.visualViewport?window.visualViewport.width:window.innerWidth}
+function gh(){return window.visualViewport?window.visualViewport.height:window.innerHeight}
+
+function resize(){
+  w=c.width=gw();
+  h=c.height=gh();
+}
+
+// 先设尺寸再初始化粒子
+resize();
+
+// 如果初始尺寸为0（极少数情况），延迟重试
+if(w===0||h===0){
+  setTimeout(function(){
+    resize();
+    initParticles();
+    if(ps.length>0)d();
+  },200);
+}
+
+function initParticles(){
+  ps=[];
+  for(var i=0;i<150;i++)ps.push({
+    x:Math.random()*w, y:Math.random()*h,
+    r:Math.random()*1.8+.4,
+    dx:(Math.random()-.5)*.4, dy:(Math.random()-.5)*.4,
+    o:Math.random()*.4+.15
+  });
+}
+
+initParticles();
+
+// 窗口大小变化时：重设canvas尺寸 + 将超出范围的粒子拉回新边界
+window.addEventListener('resize',function(){
+  var ow=w,oh=h;
+  resize();
+  // 把粒子重新映射到新尺寸（保持相对位置）
+  for(var i=0;i<ps.length;i++){
+    ps[i].x=ps[i].x/ow*w;
+    ps[i].y=ps[i].y/oh*h;
+  }
+});
+
+// 监听visualViewport变化（移动端地址栏收起/展开）
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',function(){
+    var ow=w,oh=h;
+    resize();
+    for(var i=0;i<ps.length;i++){
+      ps[i].x=ps[i].x/ow*w;
+      ps[i].y=ps[i].y/oh*h;
+    }
+  });
+}
+
 function d(){
   x.clearRect(0,0,w,h);
   var isLight=document.body.classList.contains('light');
@@ -106,11 +161,11 @@ function d(){
     x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);
     x.fillStyle='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+p.o+')';x.fill();
   }
-  var th=window.innerWidth<600?80:120;
+  var th=window.innerWidth<600?60:100;
   for(var i=0;i<ps.length;i++){for(var j=i+1;j<ps.length;j++){
     var a=ps[i],b=ps[j],dx=a.x-b.x,dy=a.y-b.y,dist=Math.sqrt(dx*dx+dy*dy);
     if(dist<th){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);
-    x.strokeStyle='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+(.05*(1-dist/th))+')';x.stroke()}}}
+    x.strokeStyle='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+(.06*(1-dist/th))+')';x.stroke()}}}
   requestAnimationFrame(d)}
 d();
 
