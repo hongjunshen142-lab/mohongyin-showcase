@@ -834,8 +834,9 @@ App.pages.battle=function(m){
   h+='<div class="pm-accuracy" id="pmAcc" style="display:none"></div></div>';
   h+='<div class="battle-timer" id="battleTimer">03:00</div>';
   h+='<div class="debate-rounds" id="debDots">';
-  for(let i=0;i<3;i++)h+='<div class="dot'+(i===0?' active':'')+'"></div>';
+  for(let i=0;i<10;i++)h+='<div class="dot'+(i===0?' active':'')+'" style="width:5px;height:5px"></div>';
   h+='</div>';
+  h+='<div id="roundCounter" style="text-align:center;font-size:.8em;color:var(--muted);margin-bottom:4px">第 1/10 轮 · 辩题循环</div>';
   h+='<div class="battle-arena" id="battleArena">';
   h+='<div class="battle-side"><div class="battle-card active" id="card1"><div class="speaker">'+a1.name+'</div><div class="speech" id="speech1"></div></div></div>';
   h+='<div class="battle-vs">VS</div>';
@@ -869,7 +870,7 @@ App.battle.start=function(s){
   // 辩论轮播: 每12秒切换一轮
   App.battle._roundInt=setInterval(()=>{
     App.battle._round++;
-    if(App.battle._round>=3)clearInterval(App.battle._roundInt);
+    if(App.battle._round>=10)clearInterval(App.battle._roundInt);
     else App.battle._showRound(App.battle._round);
   },12000);
   // 弹幕模拟
@@ -884,8 +885,10 @@ App.battle._showRound=function(r){
   let c=D.current,a1=D.agents.find(a=>a.id===c.a1),a2=D.agents.find(a=>a.id===c.a2);
   let dots=document.querySelectorAll('#debDots .dot');
   dots.forEach((d,i)=>d.classList.toggle('active',i===r));
+  let rc=document.getElementById('roundCounter');
+  if(rc)rc.textContent='第 '+(r+1)+'/10 轮 · 辩题循环';
   let t=App.battle._topic,rs=t?t.rounds:[];
-  let s1=rs[r*2],s2=rs[r*2+1];
+  let idx=r%(rs.length/2);let s1=rs[idx*2],s2=rs[idx*2+1];
   let card1=document.getElementById('card1'),card2=document.getElementById('card2');
   let sp1=document.getElementById('speech1'),sp2=document.getElementById('speech2');
   if(card1)card1.classList.add('active');if(card2)card2.classList.remove('active');
