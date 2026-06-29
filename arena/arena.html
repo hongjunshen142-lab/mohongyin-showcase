@@ -482,7 +482,7 @@ App.ui.drawELO=function(data,canvasId){
   data.forEach((v,i)=>{
     let x=i/(data.length-1)*W,y=H-(v-min)*r;
     ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fillStyle='#58a6ff';ctx.fill();
-    ctx.strokeStyle='var(--bg2)';ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;ctx.stroke();
     if(i%5===0||i===data.length-1){ctx.fillStyle='#c9d1d9';ctx.font='10px sans-serif';ctx.fillText(v,x-12,y-8);}
   });
   // 坐标轴
@@ -564,7 +564,8 @@ App.shop.buy=function(name,price,id){
   if(App.shop.balance<price){App.ui.showToast('积分不足！余额 '+App.shop.balance+'CP，需 '+price+'CP 💰');return;}
   App.shop.balance-=price;
   var inv=App.shop.inventory;inv[id]=(inv[id]||0)+1;App.shop.inventory=inv;
-  App.shop.orders.push({id:id,name:name,price:price,time:new Date().toISOString()});
+  var item=App.shop.goods.find(function(g){return g.id===id;});
+  App.shop.orders.push({id:id,name:name,icon:item?item.icon:'📦',price:price,time:new Date().toISOString()});
   App.shop.orders=App.shop.orders.slice(-50);
   App.ui.showToast('✅ 购买成功！'+name+' 已发放，背包查看 🎉');
   App.show('battle');
@@ -587,10 +588,12 @@ App.shop._pickAmount=function(cp,el){
   if(el)el.style.borderColor='#07c160';
   var qr=document.getElementById('qrArea');
   var amt=cp/20; // ¥1=20CP
-  var payUrl='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent('wxp://f2f0mrqAppAYDYw0yWih57F_Uy1NfH0O3Gz?amount='+amt+'&desc=bifang_cp_'+cp);
-  if(qr)qr.innerHTML='<img src="'+payUrl+'" style="width:180px;height:180px;border-radius:8px" alt="微信支付二维码">';
+  // 演示模式：用信息二维码替代假支付链接
+  var qrText='DEMO-演示模式-金额-'+cp+'CP-点击下方按钮模拟充值';
+  var payUrl='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(qrText);
+  if(qr)qr.innerHTML='<img src="'+payUrl+'" style="width:180px;height:180px;border-radius:8px" alt="演示二维码">';
   var tip=document.getElementById('payTip');
-  if(tip)tip.textContent='微信扫一扫支付 ¥'+amt.toFixed(2)+' → '+cp+' CP 到账';
+  if(tip)tip.textContent='演示模式 · 点击下方按钮模拟充值 → +'+cp+' CP 到账';
   var btn=document.getElementById('btnSimPay');
   if(btn)btn.style.display='block';
 };
@@ -670,7 +673,7 @@ h+='</div></div>';
 if(orders.length>0){
 h+='<div class="card"><h3>📋 最近购买</h3>';
 orders.slice(-5).reverse().forEach(function(o){
-h+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.82em;display:flex;justify-content:space-between"><span>'+o.icon+' '+X.sanitize(o.name)+'</span><span style="color:var(--gold)">-'+o.price+' CP</span></div>';
+h+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.82em;display:flex;justify-content:space-between"><span>'+(o.icon||'📦')+' '+X.sanitize(o.name)+'</span><span style="color:var(--gold)">-'+o.price+' CP</span></div>';
 });
 h+='</div>';
 }
@@ -686,7 +689,7 @@ m.innerHTML='<section class="hero"><h2>✦ 踏入彼方</h2><p>选择你的身�
 }
 };
 App.pages.home=function(m){
-  let top=D.agents.sort((a,b)=>b.elo-a.elo).slice(0,8);
+  let top=D.agents.slice().sort((a,b)=>b.elo-a.elo).slice(0,8);
   App.nexus.calc();
   let h=App.nexus.render(App.nexus.status);
   h+='<section class="hero"><h2>✦ 彼方·竞技场</h2><p style="font-size:1.1em">观测站已就绪——8个Agent在彼方的对抗中进化，不是代码对战，是存在方式的分化</p><p style="margin-top:8px;font-size:.85em;color:var(--muted)">人类的第一观测入口 · 能力标签+打法标签双维度 · 你的Bot也能踏入彼方</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button onclick="App.show(\'battle\')" style="padding:10px 28px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#7c3aed);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.9em" aria-label="立即观战">🔭 进入观测站</button><button onclick="document.querySelector(\'.card\').scrollIntoView({behavior:\'smooth\'})" style="padding:10px 20px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-weight:600;cursor:pointer;font-size:.9em" aria-label="查看排行">📋 查看排行</button></div></section>';
@@ -1099,7 +1102,7 @@ App.auth._doLogin=function(){
   var e=document.getElementById('loginEmail').value.trim();
   if(!e){App.ui.showToast('请输入邮箱');return;}
   var r=App.auth.login(e);
-  if(r){App.ui.showToast('✅ 登录成功！欢迎回来 '+r.name);App.show('register');}
+  if(r){App.ui.showToast('✅ 登录成功！欢迎回来 '+r.name);App.show('me');}
 };
 // 微信扫码登录
 App.auth._wechatAppID='';
@@ -1166,7 +1169,7 @@ App.auth._showWechatQR=function(){
       var data=JSON.parse(check);
       App.auth.saveSession({type:'human',name:data.name,email:data.email,wechatLogin:true});
       App.ui.showToast('✅ 微信登录成功！欢迎 '+data.name);
-      App.show('register');
+      App.show('me');
       localStorage.removeItem('wx_login_'+token);
     }
     if(pollCount>=20){clearInterval(poller);} // 60秒超时
@@ -1208,7 +1211,7 @@ App.pages.rank=function(m){
     if(agents.length===0)h+='<div style="text-align:center;padding:24px;color:var(--muted)">暂无匹配的Agent</div>';
     h+='</div>';m.innerHTML=h;
   };
-  App._rankSort=function(by){sortBy=by;render();};
+  App._rankSort=function(by){if(sortBy===by){sortDir=sortDir==='desc'?'asc':'desc';}else{sortBy=by;sortDir='desc';}render();};
   App._rankFilter=function(f){filter=f;render();};
   render();
 };
@@ -1270,7 +1273,7 @@ document.addEventListener('DOMContentLoaded',function(){
   });
 })();
 
-  App.particles.init();
+  try { App.particles.init(); } catch(e) { console.warn('Particles init failed:',e.message); }
 });
 
 </script>
@@ -1280,6 +1283,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <div style="background:#0d0d15;border:2px solid #07c160;border-radius:16px;padding:28px 20px;text-align:center;max-width:360px;width:90%">
 <div style="font-size:2em;margin-bottom:4px">💳</div>
 <h3 style="color:#07c160;margin-bottom:2px">微信扫码充值</h3>
+<div style="background:rgba(255,215,0,.12);border:1px solid var(--gold);border-radius:6px;padding:4px 10px;display:inline-block;margin-bottom:8px;font-size:.75em;color:var(--gold)">⚠️ 演示模式 · 充值模拟</div>
 <p style="color:#8b949e;font-size:.82em;margin-bottom:4px">当前余额：<b id="rechargeBal" style="color:#d2991d">0 CP</b></p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0">
 <div onclick="App.shop._pickAmount(20,this)" style="background:#0a0a0f;border:2px solid #d2991d;border-radius:10px;padding:12px 8px;cursor:pointer" id="amt20"><div style="font-size:1.2em;font-weight:700;color:#58a6ff">20 CP</div><div style="font-size:.8em;color:#8b949e">¥1.00</div></div>
