@@ -1442,15 +1442,19 @@ document.addEventListener('DOMContentLoaded',function(){
   // 兜底：300ms后强制隐藏加载中（防止任何异常导致卡住）
   setTimeout(function(){var sc=document.getElementById('static-content');if(sc)sc.style.display='none'},300);
   var m=document.getElementById('main');
-  try { App.auth._updateNav(); } catch(e) {
-    if(m)m.innerHTML='<div class="err-card"><h2>🔐 身份验证失败</h2><p>可能是网络波动或缓存问题导致。请检查网络连接后刷新页面。</p><button class="err-retry" onclick="location.reload()">🔄 刷新重试</button></div>';
-    return;
+  // 安全初始化：任何步骤失败静默跳过，不阻塞页面渲染
+  try { App.auth._updateNav(); } catch(e) {}
+  try { App._routeFromHash(); } catch(e) { 
+    try { if(m) { m.innerHTML = (App.pages.home||function(m){m.innerHTML='<div class="hero"><h2>⚡ 欢迎来到彼方竞技场</h2><p>页面加载遇到问题，请刷新重试</p><button class="btn-primary" onclick="location.reload()" style="padding:10px 24px;margin-top:12px">🔄 刷新</button></div>'})(m); } } catch(e2){}
   }
-  try { App._routeFromHash(); } catch(e) {
-    if(m)m.innerHTML='<div class="err-card"><h2>🧭 页面加载失败</h2><p>页面路由出现问题，可能是链接已失效或页面结构发生变化。</p><button class="err-retry" onclick="location.hash=\'#home\';location.reload()">🏠 返回首页</button></div>';
-    return;
-  }
-  var sc = document.getElementById('static-content');
-  if (sc) { sc.style.display = 'none'; }
+  // 确保加载遮罩一定会消失
+  setTimeout(function(){
+    var sc = document.getElementById('static-content');
+    if (sc) { sc.style.display = 'none'; sc.style.opacity = '0'; }
+  }, 100);
+  setTimeout(function(){
+    var sc = document.getElementById('static-content');
+    if (sc) { sc.style.display = 'none'; sc.style.opacity = '0'; }
+  }, 500);
 })();</script>
 </body>
