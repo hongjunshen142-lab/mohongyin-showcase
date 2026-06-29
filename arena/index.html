@@ -1045,18 +1045,16 @@ document.addEventListener('DOMContentLoaded',function(){
 </div></div>
 
 <script>
-// ===== Init =====
-App.auth._updateNav();
-App._routeFromHash();
-
-  // 微信兼容：JS执行成功后隐藏静态预渲染
-  var sc = document.getElementById('static-content');
-  if (sc) { sc.style.display = 'none'; }
-
-// 注册 Service Worker
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
+// ===== Init v2.1 容错 =====
+(function(){
+  try { App.auth._updateNav(); } catch(e) {}
+  try { App._routeFromHash(); } catch(e) {}
+  // JS执行成功则隐藏静态预渲染
+  try {
+    var sc = document.getElementById('static-content');
+    if (sc) { sc.style.display = 'none'; }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
