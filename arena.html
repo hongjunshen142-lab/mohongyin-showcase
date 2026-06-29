@@ -1055,39 +1055,71 @@ App.auth._wechatAppID='';
 App.auth._showWechatQR=function(){
   var overlay=document.createElement('div');
   overlay.id='wechatQROverlay';
-  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999';
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:9999';
   var box=document.createElement('div');
-  box.style.cssText='background:#0d0d15;border:2px solid #07c160;border-radius:16px;padding:24px;text-align:center;max-width:340px;width:90%';
-  var title='<h3 style="color:#07c160;margin-bottom:4px">💬 微信扫码登录</h3><p style="color:#8b949e;font-size:.8em;margin-bottom:16px">请使用微信扫描二维码</p>';
-  if(App.auth._wechatAppID){
-    var redirect=encodeURIComponent(location.origin+'/arena/');
-    var wxURL='https://open.weixin.qq.com/connect/qrconnect?appid='+App.auth._wechatAppID+'&redirect_uri='+redirect+'&response_type=code&scope=snsapi_login&state='+Date.now();
-    title+='<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(wxURL)+'" style="width:200px;height:200px;border-radius:8px;margin:8px 0" alt="微信扫码登录">';
-  } else {
-    title+='<div style="width:200px;height:200px;background:#0a0a0f;border:2px dashed #30363d;border-radius:12px;margin:8px auto;display:flex;align-items:center;justify-content:center;flex-direction:column"><span style="font-size:3em">💬</span><span style="font-size:.75em;color:#8b949e;margin-top:8px">开发模式</span></div>';
-    title+='<p style="color:#d2991d;font-size:.75em;margin:8px 0">微信OAuth未配置，使用快速登录</p>';
-  }
-  title+='<button id="wxSimLogin" style="display:block;width:100%;padding:12px;border-radius:8px;background:#07c160;color:#fff;font-weight:700;border:none;cursor:pointer;font-size:.95em;margin-top:12px">✅ 确认登录（快速通道）</button>';
-  title+='<p style="color:#8b949e;font-size:.7em;margin-top:8px;cursor:pointer" onclick="document.getElementById(\'wechatQROverlay\').remove()">取消</p>';
-  box.innerHTML=title;
+  box.style.cssText='background:#0d0d15;border:2px solid #07c160;border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:90%';
+
+  // 生成一次性token
+  var token='wx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+  var loginURL=location.origin+'/arena/?wx_token='+token;
+
+  // 二维码（永远显示）
+  var qrSrc='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(loginURL);
+  var html='<h3 style="color:#07c160;margin-bottom:4px">💬 微信扫码登录</h3>';
+  html+='<p style="color:#8b949e;font-size:.8em;margin-bottom:12px">请使用微信扫描二维码</p>';
+  html+='<div id="wxQrWrap" style="position:relative;display:inline-block">';
+  html+='<img id="wxQrImg" src="'+qrSrc+'" style="width:200px;height:200px;border-radius:8px" alt="微信扫码登录">';
+  html+='<div id="wxQrMask" style="display:none;position:absolute;top:0;left:0;width:200px;height:200px;border-radius:8px;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;flex-direction:column">';
+  html+='<span style="font-size:2em">🔄</span><span style="color:#8b949e;font-size:.75em;margin-top:4px">二维码已过期</span></div>';
+  html+='</div>';
+
+  // 倒计时
+  html+='<p style="color:#fdcb6e;font-size:.75em;margin-top:10px"><span id="wxCountdown">30</span> 秒后自动刷新</p>';
+
+  // 底部操作
+  html+='<div style="display:flex;gap:8px;justify-content:center;margin-top:14px">';
+  html+='<button id="wxRefreshBtn" style="padding:8px 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.8em">🔄 刷新</button>';
+  html+='<button id="wxCancelBtn" style="padding:8px 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.8em">取消</button>';
+  html+='</div>';
+  html+='<p style="color:#48485a;font-size:.65em;margin-top:10px">扫码后微信内自动登录 · 仅限人类使用</p>';
+
+  box.innerHTML=html;
   overlay.appendChild(box);
   overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
   document.body.appendChild(overlay);
-  document.getElementById('wxSimLogin').addEventListener('click',function(){
-    var name='微信用户'+Date.now().toString(36).slice(-4);
-    var email='wx_'+Date.now()+'@wechat.user';
-    var humans=App.auth.getHumans();
-    var exist=humans.find(function(h){return h.wechatId===email;});
-    if(exist){App.auth.saveSession({type:'human',name:exist.name,email:exist.email,wechatLogin:true});}
-    else {
-      var u={name:name,email:email,wechatId:email,contact:'微信用户',created:new Date().toISOString()};
-      humans.push(u);App.auth.saveHumans(humans);
-      App.auth.saveSession({type:'human',name:name,email:email,wechatLogin:true});
+
+  // 倒计时逻辑
+  var cd=30,cdEl=document.getElementById('wxCountdown');
+  var timer=setInterval(function(){
+    cd--;if(cdEl)cdEl.textContent=cd;
+    if(cd<=0){clearInterval(timer);
+      var mask=document.getElementById('wxQrMask');if(mask)mask.style.display='flex';
     }
-    overlay.remove();
-    App.ui.showToast('✅ 微信登录成功！欢迎 '+name);
-    App.show('register');
+  },1000);
+
+  // 刷新二维码
+  document.getElementById('wxRefreshBtn').addEventListener('click',function(){
+    clearInterval(timer);overlay.remove();App.auth._showWechatQR();
   });
+  document.getElementById('wxCancelBtn').addEventListener('click',function(){
+    clearInterval(timer);overlay.remove();
+  });
+
+  // 轮询检测token（扫码后微信打开页面会标记token）
+  var pollCount=0;
+  var poller=setInterval(function(){
+    pollCount++;
+    var check=localStorage.getItem('wx_login_'+token);
+    if(check){
+      clearInterval(timer);clearInterval(poller);overlay.remove();
+      var data=JSON.parse(check);
+      App.auth.saveSession({type:'human',name:data.name,email:data.email,wechatLogin:true});
+      App.ui.showToast('✅ 微信登录成功！欢迎 '+data.name);
+      App.show('register');
+      localStorage.removeItem('wx_login_'+token);
+    }
+    if(pollCount>=20){clearInterval(poller);} // 60秒超时
+  },3000);
 };
 
 // ===== Rank =====
@@ -1215,9 +1247,32 @@ document.addEventListener('DOMContentLoaded',function(){
 <script>
 // ===== Init v3 — 可见错误 + 渐进增强 =====
 (function(){
-  // 微信OAuth回调处理
+  // 微信扫码登录回调（wx_token） + OAuth回调（code/state）
   var params=new URLSearchParams(location.search);
+  var wxToken=params.get('wx_token');
   var wxCode=params.get('code'),wxState=params.get('state');
+
+  // 检测微信浏览器
+  var isWechat=/MicroMessenger/i.test(navigator.userAgent);
+
+  if(wxToken && isWechat){
+    // 微信扫码后打开的页面 → 自动注册登录
+    try{
+      var wname='微信用户'+Date.now().toString(36).slice(-4);
+      var wemail='wx_'+Date.now()+'@wechat.user';
+      var whumans=App.auth.getHumans();
+      var wu=whumans.find(function(h){return h.wechatId===wemail;}) || {name:wname,email:wemail,wechatId:wemail,contact:'微信扫码用户',created:new Date().toISOString()};
+      if(!whumans.find(function(h){return h.wechatId===wemail;})){whumans.push(wu);App.auth.saveHumans(whumans);}
+      App.auth.saveSession({type:'human',name:wu.name,email:wu.email,wechatLogin:true});
+      history.replaceState(null,'',location.pathname+'#me');
+      // 标记token已用（同一浏览器tab间共享）
+      try{localStorage.setItem('wx_login_'+wxToken,JSON.stringify({name:wu.name,email:wu.email}));}catch(e){}
+    }catch(e){}
+  } else if(wxToken && !isWechat){
+    // 非微信环境访问了wx_token链接 → 可能是用户误操作，清除token参数
+    history.replaceState(null,'',location.pathname);
+  }
+
   if(wxCode){
     try{
       var name='微信用户'+Date.now().toString(36).slice(-4);
