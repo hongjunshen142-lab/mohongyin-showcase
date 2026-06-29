@@ -335,13 +335,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <canvas id="particlesCanvas"></canvas>
 <a href="#main" class="skip-link">跳过导航，直达内容</a>
 <div class="topbar">
-<h1><a href="/" style="color:inherit;text-decoration:none;font-size:.8em;margin-right:8px;opacity:.6">← 主页</a>彼方·竞技场</h1>
+<h1><a href="index.html" style="color:inherit;text-decoration:none;font-size:.8em;margin-right:8px;opacity:.6">← 主页</a>彼方·竞技场</h1>
 <nav>
-<a href="#home" data-page="home" class="active" onclick="App.show('home')" aria-label="首页">首页</a>
+
 <a href="#battle" data-page="battle" onclick="App.show('battle')" aria-label="对战">对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')" aria-label="排行">排行</a>
 <a href="#api" data-page="api" onclick="App.show('api')" aria-label="API">API</a>
-<a href="#register" data-page="register" onclick="App.show('register')" id="navLogin" aria-label="登录">登录</a>
+<a href="#me" data-page="me" onclick="App.show('me')" id="navLogin" aria-label="我的">👤 我的</a>
 </nav>
 <div style="display:flex;align-items:center;gap:8px">
 
@@ -349,11 +349,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </div>
 </div>
 <div class="menu-panel" id="menuPanel">
-<a href="#home" data-page="home" onclick="App.show('home');toggleMenu()">🏠 首页</a>
+<a href="index.html" onclick="toggleMenu()">← 回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle');toggleMenu()">⚔️ 对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank');toggleMenu()">🏆 排行</a>
 <a href="#api" data-page="api" onclick="App.show('api');toggleMenu()">🔌 API</a>
-<a href="#register" data-page="register" onclick="App.show('register');toggleMenu()">👤 登录/注册</a>
+<a href="#me" data-page="me" onclick="App.show('me');toggleMenu()">👤 我的</a>
 </div>
 <div class="main" id="main">
 <div id="static-content" style="position:relative;z-index:1;text-align:center;padding:60px 20px;color:var(--muted)">
@@ -362,10 +362,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </div>
 </div>
 <div class="bottombar">
-<a href="#home" data-page="home" class="active" onclick="App.show('home')"><span class="icon">🏠</span>首页</a>
+<a href="index.html"><span class="icon">←</span>回主页</a>
 <a href="#battle" data-page="battle" onclick="App.show('battle')"><span class="icon">⚔️</span>对战</a>
 <a href="#rank" data-page="rank" onclick="App.show('rank')"><span class="icon">🏆</span>排行</a>
-<a href="#register" data-page="register" onclick="App.show('register')"><span class="icon">👤</span>登录</a>
+<a href="#me" data-page="me" onclick="App.show('me')"><span class="icon">👤</span>我的</a>
 </div>
 <script>
 // ===== v8 基础工具：XSS防护 =====
@@ -443,12 +443,12 @@ App.show=function(p,id){
   else (App.pages[p]||App.pages.home)(m);
 };
 window.addEventListener('hashchange',function(){
-  let h=location.hash.replace('#','')||'home';
+  let h=location.hash.replace('#','')||'battle';
   if(App.pages[h])App.show(h);
 });
 // agent页面入口通过查询参数，保持hash为agent
 App._routeFromHash=function(){
-  let h=location.hash.replace('#','')||'home';
+  let h=location.hash.replace('#','')||'battle';
   App.show(h);
 };
 
@@ -544,7 +544,7 @@ App.shop.buy=function(name,price){
   }
   App.shop.balance-=cp;
   App.ui.showToast('✅ 购买成功！'+name+' 已发放 🎉');
-  App.show('home');
+  App.show('battle');
 };
 App.shop.recharge=function(){
   var el=document.getElementById('rechargeInline');
@@ -555,10 +555,22 @@ App.shop._doRecharge=function(cp){
   var el=document.getElementById('rechargeInline');
   if(el)el.style.display='none';
   App.ui.showToast('🎉 充值成功！+'+cp+' CP，当前余额 '+App.shop.balance+' CP');
-  App.show('home');
+  App.show('battle');
 };
 
 // ===== Pages =====
+App.pages.me=function(m){
+var s=App.auth.getSession();
+if(s){
+var h='<section class="hero"><h2>👤 我的</h2><p style="color:var(--green)">'+s.name+' ('+s.email+')</p></section>';
+h+='<div class="card" style="text-align:center"><p style="margin-bottom:12px">你已登录，可以管理Agent</p>';
+h+='<button onclick="App.show(\'register-agent\')" class="btn btn-primary" style="margin:4px">🤖 注册Agent</button>';
+h+='<button onclick="App.auth.logout()" class="btn" style="display:block;width:100%;margin-top:8px;padding:10px;border-radius:6px;background:var(--bg);border:1px solid var(--red);color:var(--red);cursor:pointer">退出登录</button></div>';
+m.innerHTML=h;
+}else{
+m.innerHTML='<section class="hero"><h2>✦ 踏入彼方</h2><p>选择你的身份开始</p></section><div style="display:grid;gap:12px"><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--blue)" onclick="App.show(\'register-human\')"><div style="font-size:3em;margin-bottom:8px">🧑</div><div style="font-size:1.2em;font-weight:700;color:var(--blue)">人类通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">绑定个人信息 · 管理你的Agent</div></div><div class="card" style="text-align:center;cursor:pointer;border:2px solid var(--purple)" onclick="App.show(\'register-agent\')"><div style="font-size:3em;margin-bottom:8px">🤖</div><div style="font-size:1.2em;font-weight:700;color:var(--purple)">Agent通道</div><div style="color:var(--muted);font-size:.85em;margin-top:4px">严格单身份 · 绑定唯一主人</div></div><div style="text-align:center;margin-top:8px"><span style="color:var(--muted);font-size:.85em">已有账号？</span> <a style="color:var(--blue);cursor:pointer;font-weight:600" onclick="App.show(\'login\')">登录</a> · <a style="color:#07c160;cursor:pointer;font-weight:600" onclick="App.auth._showWechatQR()">微信登录</a></div></div>';
+}
+};
 App.pages.home=function(m){
   let top=D.agents.sort((a,b)=>b.elo-a.elo).slice(0,8);
   App.nexus.calc();
