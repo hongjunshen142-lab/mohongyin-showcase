@@ -608,12 +608,13 @@ App.ui.showToast=function(msg){
 
 // ===== Shop =====
 App.shop={_key_bal:'arena_balance',_key_inv:'arena_inventory',_key_orders:'arena_orders',
-  get balance(){var v=parseInt(localStorage.getItem(this._key_bal))||0;return v;},
-  set balance(v){localStorage.setItem(this._key_bal,v);},
-  get inventory(){try{return JSON.parse(localStorage.getItem(this._key_inv)||'{}')}catch(e){return{}}},
-  set inventory(v){localStorage.setItem(this._key_inv,JSON.stringify(v));},
-  get orders(){try{return JSON.parse(localStorage.getItem(this._key_orders)||'[]')}catch(e){return[]}},
-  set orders(v){localStorage.setItem(this._key_orders,JSON.stringify(v));},
+  _ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){},removeItem:function(){}}},
+  get balance(){try{var v=parseInt(this._ls().getItem(this._key_bal))||0;return v}catch(e){return 0}},
+  set balance(v){try{this._ls().setItem(this._key_bal,v)}catch(e){}},
+  get inventory(){try{return JSON.parse(this._ls().getItem(this._key_inv)||'{}')}catch(e){return{}}},
+  set inventory(v){try{this._ls().setItem(this._key_inv,JSON.stringify(v))}catch(e){}},
+  get orders(){try{return JSON.parse(this._ls().getItem(this._key_orders)||'[]')}catch(e){return[]}},
+  set orders(v){try{this._ls().setItem(this._key_orders,JSON.stringify(v))}catch(e){}},
   goods:[
     {id:'ticket',icon:'🎫',name:'参赛券',price:50,stock:99,desc:'让你的Agent参加一次正式对战',bind:true},
     {id:'double',icon:'⚡',name:'双倍积分卡',price:100,stock:50,desc:'下一场对战ELO变动翻倍',bind:true},
@@ -807,14 +808,16 @@ App.pages.home=function(m){
 
 // ===== Battle =====
 App.battle={_int:null,_roundInt:null,_round:0,_timer:0,_topic:null,_mode:'standard',_judgeScores:null,
-  _key:'arena_history',_save:function(result){
-    var h=[];try{h=JSON.parse(localStorage.getItem(this._key))||[];}catch(e){}
+  _key:'arena_history',
+  _ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){}}},
+  _save:function(result){
+    var h=[];try{h=JSON.parse(this._ls().getItem(this._key))||[];}catch(e){}
     var names={};D.agents.forEach(function(a){names[a.id]=a.name;});
     h.unshift({time:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),a1:names[result.a1]||result.a1,a2:names[result.a2]||result.a2,winner:names[result.winner]||result.winner,elo:result.elo,topic:(this._topic||{}).topic||''});
     if(h.length>50)h=h.slice(0,50);
-    localStorage.setItem(this._key,JSON.stringify(h));
+    try{this._ls().setItem(this._key,JSON.stringify(h))}catch(e){}
   },
-  _getHistory:function(){try{return JSON.parse(localStorage.getItem(this._key))||[];}catch(e){return[];}}
+  _getHistory:function(){try{return JSON.parse(this._ls().getItem(this._key))||[];}catch(e){return[];}}
 };
 App.pages.battle=function(m){
   let c=D.current,a1=D.agents.find(a=>a.id===c.a1),a2=D.agents.find(a=>a.id===c.a2);
@@ -1312,7 +1315,7 @@ App.pages.history=function(m){
   m.innerHTML=h;
 };
 // ===== Guest系统 =====
-App._guest={_key:"arena_guest_views",get views(){return parseInt(localStorage.getItem(this._key))||0},set views(v){localStorage.setItem(this._key,v)},inc:function(){this.views++;if(this.views>=3&&!App.auth.isLoggedIn()){setTimeout(function(){App.ui.showToast("👋 看了"+App._guest.views+"场了，注册后可以投票+接入API+开商城哦")},1500)}}};
+App._guest={_key:"arena_guest_views",_ls:function(){try{if(typeof localStorage!=='undefined'&&localStorage)return localStorage}catch(e){}return{getItem:function(){return null},setItem:function(){}}},get views(){try{return parseInt(this._ls().getItem(this._key))||0}catch(e){return 0}},set views(v){try{this._ls().setItem(this._key,v)}catch(e){}},inc:function(){this.views++;if(this.views>=3&&!App.auth.isLoggedIn()){setTimeout(function(){App.ui.showToast("👋 看了"+App._guest.views+"场了，注册后可以投票+接入API+开商城哦")},1500)}}};
 
 
 // ===== Menu =====
