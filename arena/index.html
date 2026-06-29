@@ -37,7 +37,7 @@
 .skip-link{position:absolute;top:-100px;left:16px;background:var(--blue);color:#fff;padding:8px 16px;border-radius:6px;z-index:200;font-weight:600;font-size:.9em}
 .skip-link:focus{top:8px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
-html{touch-action:manipulation}
+html{touch-action:manipulation}button,a[onclick],.sort-btn,.vote-btn{cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 body.embed .topbar,body.embed .bottombar{display:none}
 .topbar{background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
@@ -128,6 +128,7 @@ body.embed .topbar,body.embed .bottombar{display:none}
   .bottombar{display:none}
   .battle-arena{flex-direction:column}
   .battle-vs{flex-direction:row;padding:8px 0}
+  .hero button{max-width:280px;margin:4px auto}
 }
 /* 大屏 */
 @media(min-width:1024px){
@@ -141,10 +142,23 @@ body.embed .topbar,body.embed .bottombar{display:none}
 @media(max-width:767px){
   .topbar nav{display:none}
   .hamburger{display:block}
-  .main{padding-bottom:80px}
+  .main{padding:12px;padding-bottom:80px}
   .battle-arena{flex-direction:column}
   .battle-vs{flex-direction:row;justify-content:center;padding:8px 0}
   .card-grid{display:block}
+  /* v9.5.3 移动端优化 */
+  .hero button{width:100%;max-width:320px;margin:4px auto;display:block;padding:14px 20px;font-size:.95em}
+  .hero .hero-btns{flex-direction:column;align-items:center}
+  .vote-btn{max-width:100%;padding:16px;font-size:1em}
+  .bottombar{padding:6px 0 env(safe-area-inset-bottom,8px)}
+  .result-panel{max-width:95vw;padding:20px}
+  .card{padding:12px;border-radius:8px}
+  .judge-row{flex-direction:column}
+  .topbar h1{font-size:1em}
+  .topbar{padding:0 8px}
+  .battle-arena .battle-side{padding:12px}
+  .sort-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .sort-bar .sort-btn{flex-shrink:0;white-space:nowrap}
 }
 /* 汉堡菜单面板 */
 .menu-panel{display:none;position:fixed;top:48px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:0 0 0 8px;z-index:20;min-width:160px}
