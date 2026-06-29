@@ -1,5 +1,5 @@
 // 暗码矩阵 Service Worker — 离线缓存
-const CACHE_NAME = 'arena-v3-20260626';
+const CACHE_NAME = 'arena-v5-20260629';
 const ASSETS = [
   '/mohongyin-showcase/arena/',
   '/mohongyin-showcase/arena/index.html',
