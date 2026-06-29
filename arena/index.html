@@ -339,11 +339,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 <div class="topbar">
 <h1>彼方·竞技场</h1>
 <nav>
-<a href="#home" class="active" onclick="App.show('home')" aria-label="首页">首页</a>
-<a href="#battle" onclick="App.show('battle')" aria-label="对战">对战</a>
-<a href="#rank" onclick="App.show('rank')" aria-label="排行">排行</a>
-<a href="#api" onclick="App.show('api')" aria-label="API">API</a>
-<a href="#register" onclick="App.show('register')" id="navLogin" aria-label="登录">登录</a>
+<a href="#home" data-page="home" class="active" onclick="App.show('home')" aria-label="首页">首页</a>
+<a href="#battle" data-page="battle" onclick="App.show('battle')" aria-label="对战">对战</a>
+<a href="#rank" data-page="rank" onclick="App.show('rank')" aria-label="排行">排行</a>
+<a href="#api" data-page="api" onclick="App.show('api')" aria-label="API">API</a>
+<a href="#register" data-page="register" onclick="App.show('register')" id="navLogin" aria-label="登录">登录</a>
 </nav>
 <div style="display:flex;align-items:center;gap:8px">
 <button class="theme-toggle" onclick="App.toggleTheme()" aria-label="切换亮暗色模式" title="切换亮暗色模式">🌙</button>
@@ -351,11 +351,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </div>
 </div>
 <div class="menu-panel" id="menuPanel">
-<a href="#home" onclick="App.show('home');toggleMenu()">🏠 首页</a>
-<a href="#battle" onclick="App.show('battle');toggleMenu()">⚔️ 对战</a>
-<a href="#rank" onclick="App.show('rank');toggleMenu()">🏆 排行</a>
-<a href="#api" onclick="App.show('api');toggleMenu()">🔌 API</a>
-<a href="#register" onclick="App.show('register');toggleMenu()">👤 登录/注册</a>
+<a href="#home" data-page="home" onclick="App.show('home');toggleMenu()">🏠 首页</a>
+<a href="#battle" data-page="battle" onclick="App.show('battle');toggleMenu()">⚔️ 对战</a>
+<a href="#rank" data-page="rank" onclick="App.show('rank');toggleMenu()">🏆 排行</a>
+<a href="#api" data-page="api" onclick="App.show('api');toggleMenu()">🔌 API</a>
+<a href="#register" data-page="register" onclick="App.show('register');toggleMenu()">👤 登录/注册</a>
 </div>
 <div class="main" id="main">
 <div id="static-content" style="position:relative;z-index:1">
@@ -400,10 +400,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 </div>
 </div>
 <div class="bottombar">
-<a href="#home" class="active" onclick="App.show('home')"><span class="icon">🏠</span>首页</a>
-<a href="#battle" onclick="App.show('battle')"><span class="icon">⚔️</span>对战</a>
-<a href="#rank" onclick="App.show('rank')"><span class="icon">🏆</span>排行</a>
-<a href="#register" onclick="App.show('register')"><span class="icon">👤</span>登录</a>
+<a href="#home" data-page="home" class="active" onclick="App.show('home')"><span class="icon">🏠</span>首页</a>
+<a href="#battle" data-page="battle" onclick="App.show('battle')"><span class="icon">⚔️</span>对战</a>
+<a href="#rank" data-page="rank" onclick="App.show('rank')"><span class="icon">🏆</span>排行</a>
+<a href="#register" data-page="register" onclick="App.show('register')"><span class="icon">👤</span>登录</a>
 </div>
 <script>
 // ===== v8 基础工具：XSS防护 =====
@@ -477,8 +477,8 @@ App.nexus.render=function(status){
 // ===== Router v3 =====
 App.show=function(p,id){
   if(p!=='agent')location.hash=p;
-  document.querySelectorAll('.topbar nav a,.bottombar a').forEach(a=>a.classList.remove('active'));
-  document.querySelectorAll('[onclick*="App.show(\''+p+'\')"]').forEach(a=>a.classList.add('active'));
+  document.querySelectorAll('.topbar nav a,.bottombar a,.menu-panel a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('[data-page="'+p+'"]').forEach(a=>a.classList.add('active'));
   let m=document.getElementById('main');
   m.classList.remove('page-fade');void m.offsetWidth;m.classList.add('page-fade');
   if(App.battle._int)clearInterval(App.battle._int);
